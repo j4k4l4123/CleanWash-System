@@ -37,6 +37,13 @@ foreach ($cacheEnv as $key => $val) {
     $_SERVER[$key] = $val;
 }
 
+// Force HTTPS environment variables when behind Vercel SSL proxy
+if ((isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') ||
+    (isset($_SERVER['HTTP_X_FORWARDED_SSL']) && $_SERVER['HTTP_X_FORWARDED_SSL'] === 'on')) {
+    $_SERVER['HTTPS'] = 'on';
+    $_SERVER['SERVER_PORT'] = 443;
+}
+
 // Forward execution to Laravel's public entrypoint
 try {
     require __DIR__.'/../public/index.php';

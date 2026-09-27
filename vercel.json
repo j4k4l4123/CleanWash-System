@@ -37,6 +37,7 @@
     "APP_ROUTES_CACHE": "/tmp/bootstrap/cache/routes-v7.php",
     "APP_EVENTS_CACHE": "/tmp/bootstrap/cache/events.php",
     "SESSION_DRIVER": "cookie",
+    "SESSION_SECURE_COOKIE": "true",
     "CACHE_STORE": "array",
     "LOG_CHANNEL": "stderr"
   }

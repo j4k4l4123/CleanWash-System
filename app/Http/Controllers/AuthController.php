@@ -47,7 +47,12 @@ class AuthController extends Controller
 
             $request->session()->regenerate();
 
-            return redirect()->intended(route('dashboard'))
+            $intended = session()->pull('url.intended', route('dashboard'));
+            if (is_string($intended) && str_starts_with($intended, 'http://') && ! str_contains($intended, 'localhost') && ! str_contains($intended, '127.0.0.1')) {
+                $intended = preg_replace('/^http:/i', 'https:', $intended);
+            }
+
+            return redirect()->to($intended)
                 ->with('success', 'Selamat datang kembali, '.Auth::user()->name.'!');
         }
 

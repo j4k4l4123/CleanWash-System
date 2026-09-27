@@ -113,4 +113,52 @@ class AuthTest extends TestCase
 
         $response->assertStatus(200);
     }
+
+    /**
+     * Test that login redirect preserves HTTPS scheme when behind a reverse proxy.
+     */
+    public function test_login_redirect_preserves_https_behind_reverse_proxy(): void
+    {
+        $admin = User::factory()->admin()->create([
+            'email' => 'admin@laundry.test',
+            'password' => bcrypt('password123'),
+        ]);
+
+        $response = $this->withServerVariables([
+            'HTTP_X_FORWARDED_PROTO' => 'https',
+            'HTTP_X_FORWARDED_PORT' => '443',
+        ])->withSession([
+            'url.intended' => 'https://cleanwash.vercel.app/dashboard',
+        ])->post('/login', [
+            'email' => 'admin@laundry.test',
+            'password' => 'password123',
+        ]);
+
+        $this->assertAuthenticatedAs($admin);
+        $response->assertRedirect('https://cleanwash.vercel.app/dashboard');
+    }
+
+    /**
+     * Test that any legacy http intended URL is upgraded to https.
+     */
+    public function test_legacy_http_intended_url_is_upgraded_to_https(): void
+    {
+        $admin = User::factory()->admin()->create([
+            'email' => 'admin@laundry.test',
+            'password' => bcrypt('password123'),
+        ]);
+
+        $response = $this->withServerVariables([
+            'HTTP_X_FORWARDED_PROTO' => 'https',
+            'HTTP_X_FORWARDED_PORT' => '443',
+        ])->withSession([
+            'url.intended' => 'http://cleanwash.vercel.app/dashboard',
+        ])->post('/login', [
+            'email' => 'admin@laundry.test',
+            'password' => 'password123',
+        ]);
+
+        $this->assertAuthenticatedAs($admin);
+        $response->assertRedirect('https://cleanwash.vercel.app/dashboard');
+    }
 }
