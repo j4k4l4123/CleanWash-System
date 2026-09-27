@@ -20,6 +20,23 @@ foreach ($storageDirs as $dir) {
     }
 }
 
+// Redirect all cache paths from read-only /var/task to writable /tmp
+$cacheEnv = [
+    'APP_STORAGE' => '/tmp/storage',
+    'VIEW_COMPILED_PATH' => '/tmp/storage/framework/views',
+    'APP_SERVICES_CACHE' => '/tmp/bootstrap/cache/services.php',
+    'APP_PACKAGES_CACHE' => '/tmp/bootstrap/cache/packages.php',
+    'APP_CONFIG_CACHE' => '/tmp/bootstrap/cache/config.php',
+    'APP_ROUTES_CACHE' => '/tmp/bootstrap/cache/routes-v7.php',
+    'APP_EVENTS_CACHE' => '/tmp/bootstrap/cache/events.php',
+];
+
+foreach ($cacheEnv as $key => $val) {
+    putenv("{$key}={$val}");
+    $_ENV[$key] = $val;
+    $_SERVER[$key] = $val;
+}
+
 // Forward execution to Laravel's public entrypoint
 try {
     require __DIR__.'/../public/index.php';
