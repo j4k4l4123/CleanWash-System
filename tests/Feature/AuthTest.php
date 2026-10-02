@@ -44,11 +44,11 @@ class AuthTest extends TestCase
     }
 
     /**
-     * Test that non-admin users cannot authenticate using the login screen.
+     * Test that kasir users can authenticate using the login screen.
      */
-    public function test_non_admin_users_cannot_authenticate_using_the_login_screen(): void
+    public function test_kasir_can_authenticate_using_the_login_screen(): void
     {
-        User::factory()->kasir()->create([
+        $kasir = User::factory()->kasir()->create([
             'email' => 'kasir@laundry.test',
             'password' => bcrypt('password123'),
         ]);
@@ -58,8 +58,8 @@ class AuthTest extends TestCase
             'password' => 'password123',
         ]);
 
-        $this->assertGuest();
-        $response->assertSessionHasErrors('email');
+        $this->assertAuthenticatedAs($kasir);
+        $response->assertRedirect(route('dashboard'));
     }
 
     /**
@@ -102,16 +102,6 @@ class AuthTest extends TestCase
         $response = $this->get('/dashboard');
 
         $response->assertRedirect(route('login'));
-    }
-
-    /**
-     * Test that public tracking page remains accessible without login.
-     */
-    public function test_public_tracking_is_accessible_without_login(): void
-    {
-        $response = $this->get('/tracking');
-
-        $response->assertStatus(200);
     }
 
     /**

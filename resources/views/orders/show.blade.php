@@ -272,7 +272,7 @@
                             Tagihan sebesar <span class="font-bold">Rp {{ number_format($order->total_harga, 0, ',', '.') }}</span> belum dibayar.
                         </div>
 
-                        <form action="{{ route('payments.store', $order) }}" method="POST" class="space-y-3">
+                        <form action="{{ route('orders.pay', $order) }}" method="POST" class="space-y-3">
                             @csrf
                             <div>
                                 <label class="block text-[11px] font-semibold text-slate-700 uppercase mb-1">Metode Bayar</label>

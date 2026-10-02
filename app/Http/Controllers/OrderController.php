@@ -235,4 +235,58 @@ class OrderController extends Controller
 
         return view('orders.print', compact('order'));
     }
+
+    public function pay(Request $request, Order $order)
+    {
+        if ($order->status_pembayaran === 'lunas') {
+            return back()->with('error', "Order {$order->kode_order} sudah berstatus lunas!");
+        }
+
+        $validated = $request->validate([
+            'metode_pembayaran' => 'required|in:tunai,transfer,qris',
+            'uang_diterima' => 'nullable|numeric|min:0',
+            'catatan' => 'nullable|string',
+        ]);
+
+        $totalHarga = $order->total_harga;
+        $uangDiterima = $validated['uang_diterima'] ? (float) $validated['uang_diterima'] : $totalHarga;
+
+        if ($validated['metode_pembayaran'] === 'tunai' && $uangDiterima < $totalHarga) {
+            return back()->with('error', 'Uang yang diterima kurang dari total tagihan!');
+        }
+
+        $kembalian = max(0, $uangDiterima - $totalHarga);
+        $dateCode = Carbon::now()->format('Ymd');
+        $paymentCount = Payment::whereDate('tgl_bayar', Carbon::today())->count();
+        $kodePembayaran = 'INV-'.$dateCode.'-'.str_pad($paymentCount + 1, 3, '0', STR_PAD_LEFT);
+
+        DB::beginTransaction();
+        try {
+            $order->update([
+                'status_pembayaran' => 'lunas',
+                'metode_pembayaran' => $validated['metode_pembayaran'],
+            ]);
+
+            $payment = Payment::create([
+                'order_id' => $order->id,
+                'kode_pembayaran' => $kodePembayaran,
+                'jumlah_bayar' => $totalHarga,
+                'uang_diterima' => $uangDiterima,
+                'kembalian' => $kembalian,
+                'metode_pembayaran' => $validated['metode_pembayaran'],
+                'status' => 'lunas',
+                'tgl_bayar' => Carbon::now(),
+                'catatan' => $validated['catatan'] ?? 'Pelunasan tagihan laundry',
+            ]);
+
+            DB::commit();
+
+            return redirect()->route('orders.show', $order)
+                ->with('success', "Pembayaran untuk {$order->kode_order} berhasil diproses (No Invoice: {$payment->kode_pembayaran})!");
+        } catch (\Throwable $e) {
+            DB::rollBack();
+
+            return back()->with('error', 'Gagal memproses pembayaran: '.$e->getMessage());
+        }
+    }
 }

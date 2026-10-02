@@ -137,17 +137,6 @@
                     </button>
                 </div>
             </form>
-
-            <!-- Public Tracking Portal link -->
-            <div class="text-center pt-4 border-t border-slate-100">
-                <p class="text-xs text-slate-500">
-                    Bukan petugas laundry?
-                    <a href="{{ route('tracking.index') }}" class="font-semibold text-brand-600 hover:text-brand-700 hover:underline">
-                        Lacak cucian Anda di sini &rarr;
-                    </a>
-                </p>
-            </div>
-
         </div>
 
         <!-- Footer Note -->
