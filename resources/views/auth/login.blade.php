@@ -54,13 +54,13 @@
             </div>
             <div>
                 <h1 class="text-2xl font-bold tracking-tight text-slate-900">CleanWash Laundry</h1>
-                <p class="text-xs sm:text-sm text-slate-500 font-medium">Sistem Manajemen Kasir & Operasional (Kelompok 2)</p>
+                <p class="text-xs sm:text-sm text-slate-500 font-medium">Sistem Manajemen Kasir & Operasional</p>
             </div>
         </div>
 
         <!-- Login Card -->
         <div class="mt-8 bg-white py-8 px-6 sm:px-10 rounded-3xl border border-slate-200/80 shadow-sm space-y-6">
-            
+
             <!-- Success or Error Alert -->
             @if (session('success'))
                 <div class="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-medium flex items-center gap-2">
