@@ -51,12 +51,17 @@ class CustomerController extends Controller
 
     public function show(Customer $customer)
     {
-        $customer->load(['orders.service', 'orders.payment']);
-        $totalOrders = $customer->orders->count();
-        $totalSpending = $customer->orders->where('status_pembayaran', 'lunas')->sum('total_harga');
-        $activeOrders = $customer->orders->whereNotIn('status_cucian', ['selesai', 'dibatalkan'])->count();
+        $totalOrders = $customer->orders()->count();
+        $totalSpending = (float) ($customer->orders()->where('status_pembayaran', 'lunas')->sum('total_harga') ?? 0);
+        $activeOrders = $customer->orders()->whereNotIn('status_cucian', ['selesai', 'dibatalkan'])->count();
 
-        return view('customers.show', compact('customer', 'totalOrders', 'totalSpending', 'activeOrders'));
+        $orders = $customer->orders()
+            ->with(['service', 'payment'])
+            ->latest('tgl_masuk')
+            ->paginate(10)
+            ->withQueryString();
+
+        return view('customers.show', compact('customer', 'totalOrders', 'totalSpending', 'activeOrders', 'orders'));
     }
 
     public function edit(Customer $customer)

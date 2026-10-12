@@ -39,9 +39,11 @@
                 </label>
                 <select id="service_id" name="service_id" required class="w-full px-4 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500">
                     @foreach ($services as $svc)
-                        <option value="{{ $svc->id }}" {{ old('service_id', $order->service_id) == $svc->id ? 'selected' : '' }}>
-                            {{ $svc->nama_layanan }} - Rp {{ number_format($svc->harga, 0, ',', '.') }}/{{ $svc->jenis === 'kiloan' ? 'kg' : 'pcs' }}
-                        </option>
+                        @if (is_object($svc))
+                            <option value="{{ $svc->id }}" {{ old('service_id', $order->service_id) == $svc->id ? 'selected' : '' }}>
+                                {{ $svc->nama_layanan }} - Rp {{ number_format($svc->harga, 0, ',', '.') }}/{{ $svc->jenis === 'kiloan' ? 'kg' : 'pcs' }}
+                            </option>
+                        @endif
                     @endforeach
                 </select>
             </div>

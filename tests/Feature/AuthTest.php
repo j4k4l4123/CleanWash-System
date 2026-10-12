@@ -105,6 +105,16 @@ class AuthTest extends TestCase
     }
 
     /**
+     * Test that public tracking page remains accessible without login.
+     */
+    public function test_public_tracking_is_accessible_without_login(): void
+    {
+        $response = $this->get('/tracking');
+
+        $response->assertStatus(200);
+    }
+
+    /**
      * Test that login redirect preserves HTTPS scheme when behind a reverse proxy.
      */
     public function test_login_redirect_preserves_https_behind_reverse_proxy(): void

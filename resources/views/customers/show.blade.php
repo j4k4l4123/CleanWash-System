@@ -105,7 +105,7 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 text-slate-700">
-                    @forelse ($customer->orders as $order)
+                    @forelse ($orders as $order)
                         <tr class="hover:bg-slate-50/70 transition">
                             <td class="px-5 py-4 font-mono font-medium text-slate-900">
                                 <a href="{{ route('orders.show', $order) }}" class="text-brand-600 hover:underline">
@@ -150,6 +150,12 @@
                 </tbody>
             </table>
         </div>
+
+        @if($orders->hasPages())
+            <div class="p-4 border-t border-slate-100">
+                {{ $orders->links() }}
+            </div>
+        @endif
     </div>
 
 </div>

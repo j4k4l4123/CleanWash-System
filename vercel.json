@@ -8,6 +8,26 @@
       "runtime": "vercel-php@0.8.0"
     }
   },
+  "headers": [
+    {
+      "source": "/(css|js|images|fonts|build)/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/(favicon.*|apple-touch-icon.png)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=86400"
+        }
+      ]
+    }
+  ],
   "routes": [
     {
       "src": "/(css|js|images|fonts|build)/(.*)",
@@ -24,7 +44,7 @@
   ],
   "env": {
     "APP_ENV": "production",
-    "APP_DEBUG": "true",
+    "APP_DEBUG": "false",
     "APP_STORAGE": "/tmp/storage",
     "VIEW_COMPILED_PATH": "/tmp/storage/framework/views",
     "APP_SERVICES_CACHE": "/tmp/bootstrap/cache/services.php",

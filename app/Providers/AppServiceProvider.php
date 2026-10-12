@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
@@ -20,10 +21,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Model::preventLazyLoading(! app()->isProduction());
+
         if (
             app()->environment('production') ||
             env('APP_ENV') === 'production' ||
-            request()->header('x-forwarded-proto') === 'https' ||
+            (app()->has('request') && request()->header('x-forwarded-proto') === 'https') ||
             (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') ||
             str_contains((string) config('app.url'), 'https://')
         ) {

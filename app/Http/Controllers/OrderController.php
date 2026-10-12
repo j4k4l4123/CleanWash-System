@@ -8,7 +8,9 @@ use App\Models\OrderStatusLog;
 use App\Models\Payment;
 use App\Models\Service;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
@@ -51,10 +53,32 @@ class OrderController extends Controller
 
     public function create()
     {
-        $customers = Customer::orderBy('nama')->get();
-        $services = Service::where('is_active', true)->orderBy('nama_layanan')->get();
+        $customers = Customer::select(['id', 'nama', 'kode_pelanggan', 'no_hp'])->orderBy('nama')->get();
+        $services = $this->getActiveServices();
 
         return view('orders.create', compact('customers', 'services'));
+    }
+
+    protected function getActiveServices()
+    {
+        $cached = Cache::remember('active_services', 3600, function () {
+            return Service::where('is_active', true)
+                ->orderBy('nama_layanan')
+                ->get()
+                ->toArray();
+        });
+
+        if ($cached instanceof Collection) {
+            return $cached;
+        }
+
+        if (is_array($cached)) {
+            return Service::hydrate($cached);
+        }
+
+        Cache::forget('active_services');
+
+        return Service::where('is_active', true)->orderBy('nama_layanan')->get();
     }
 
     public function store(Request $request)
@@ -152,8 +176,8 @@ class OrderController extends Controller
 
     public function edit(Order $order)
     {
-        $customers = Customer::orderBy('nama')->get();
-        $services = Service::where('is_active', true)->orderBy('nama_layanan')->get();
+        $customers = Customer::select(['id', 'nama', 'kode_pelanggan', 'no_hp'])->orderBy('nama')->get();
+        $services = $this->getActiveServices();
 
         return view('orders.edit', compact('order', 'customers', 'services'));
     }
@@ -234,59 +258,5 @@ class OrderController extends Controller
         $order->load(['customer', 'service', 'payment']);
 
         return view('orders.print', compact('order'));
-    }
-
-    public function pay(Request $request, Order $order)
-    {
-        if ($order->status_pembayaran === 'lunas') {
-            return back()->with('error', "Order {$order->kode_order} sudah berstatus lunas!");
-        }
-
-        $validated = $request->validate([
-            'metode_pembayaran' => 'required|in:tunai,transfer,qris',
-            'uang_diterima' => 'nullable|numeric|min:0',
-            'catatan' => 'nullable|string',
-        ]);
-
-        $totalHarga = $order->total_harga;
-        $uangDiterima = $validated['uang_diterima'] ? (float) $validated['uang_diterima'] : $totalHarga;
-
-        if ($validated['metode_pembayaran'] === 'tunai' && $uangDiterima < $totalHarga) {
-            return back()->with('error', 'Uang yang diterima kurang dari total tagihan!');
-        }
-
-        $kembalian = max(0, $uangDiterima - $totalHarga);
-        $dateCode = Carbon::now()->format('Ymd');
-        $paymentCount = Payment::whereDate('tgl_bayar', Carbon::today())->count();
-        $kodePembayaran = 'INV-'.$dateCode.'-'.str_pad($paymentCount + 1, 3, '0', STR_PAD_LEFT);
-
-        DB::beginTransaction();
-        try {
-            $order->update([
-                'status_pembayaran' => 'lunas',
-                'metode_pembayaran' => $validated['metode_pembayaran'],
-            ]);
-
-            $payment = Payment::create([
-                'order_id' => $order->id,
-                'kode_pembayaran' => $kodePembayaran,
-                'jumlah_bayar' => $totalHarga,
-                'uang_diterima' => $uangDiterima,
-                'kembalian' => $kembalian,
-                'metode_pembayaran' => $validated['metode_pembayaran'],
-                'status' => 'lunas',
-                'tgl_bayar' => Carbon::now(),
-                'catatan' => $validated['catatan'] ?? 'Pelunasan tagihan laundry',
-            ]);
-
-            DB::commit();
-
-            return redirect()->route('orders.show', $order)
-                ->with('success', "Pembayaran untuk {$order->kode_order} berhasil diproses (No Invoice: {$payment->kode_pembayaran})!");
-        } catch (\Throwable $e) {
-            DB::rollBack();
-
-            return back()->with('error', 'Gagal memproses pembayaran: '.$e->getMessage());
-        }
     }
 }

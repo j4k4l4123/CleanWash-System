@@ -1,5 +1,12 @@
 <?php
 
+use App\Models\Customer;
+use App\Models\Order;
+use App\Models\Service;
+use App\Models\User;
+use Carbon\Carbon;
+use Carbon\CarbonImmutable;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
 return [
@@ -131,6 +138,15 @@ return [
     |
     */
 
-    'serializable_classes' => false,
-
+    'serializable_classes' => [
+        Illuminate\Database\Eloquent\Collection::class,
+        Collection::class,
+        Service::class,
+        Order::class,
+        Customer::class,
+        User::class,
+        Illuminate\Support\Carbon::class,
+        Carbon::class,
+        CarbonImmutable::class,
+    ],
 ];

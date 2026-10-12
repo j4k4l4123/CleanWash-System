@@ -122,9 +122,6 @@
                                     <a href="{{ route('orders.show', $order) }}" class="px-2.5 py-1 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition">
                                         Detail
                                     </a>
-                                    <a href="{{ route('orders.print', $order) }}" target="_blank" class="px-2.5 py-1 text-xs font-medium text-brand-700 bg-brand-50 hover:bg-brand-100 rounded-lg transition" title="Cetak Nota">
-                                        Nota
-                                    </a>
                                 </div>
                             </td>
                         </tr>

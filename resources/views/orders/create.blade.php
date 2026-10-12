@@ -53,13 +53,15 @@
                     <select id="service_id" name="service_id" required onchange="calculateTotal()" class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500 focus:bg-white transition">
                         <option value="">-- Pilih Layanan --</option>
                         @foreach ($services as $svc)
-                            <option value="{{ $svc->id }}" 
-                                    data-harga="{{ $svc->harga }}" 
-                                    data-jenis="{{ $svc->jenis }}"
-                                    data-durasi="{{ $svc->durasi_jam }}"
-                                    {{ old('service_id') == $svc->id ? 'selected' : '' }}>
-                                {{ $svc->nama_layanan }} - Rp {{ number_format($svc->harga, 0, ',', '.') }}/{{ $svc->jenis === 'kiloan' ? 'kg' : 'pcs' }} ({{ $svc->durasi_jam }} jam)
-                            </option>
+                            @if (is_object($svc))
+                                <option value="{{ $svc->id }}" 
+                                        data-harga="{{ $svc->harga }}" 
+                                        data-jenis="{{ $svc->jenis }}"
+                                        data-durasi="{{ $svc->durasi_jam }}"
+                                        {{ old('service_id') == $svc->id ? 'selected' : '' }}>
+                                    {{ $svc->nama_layanan }} - Rp {{ number_format($svc->harga, 0, ',', '.') }}/{{ $svc->jenis === 'kiloan' ? 'kg' : 'pcs' }} ({{ $svc->durasi_jam }} jam)
+                                </option>
+                            @endif
                         @endforeach
                     </select>
                 </div>
