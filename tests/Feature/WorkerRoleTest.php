@@ -50,4 +50,58 @@ class WorkerRoleTest extends TestCase
         $this->actingAs($pekerja)->get('/users')->assertStatus(403);
         $this->actingAs($pekerja)->get('/orders/create')->assertStatus(403);
     }
+
+    public function test_pekerja_only_sees_orders_with_status_diterima(): void
+    {
+        $pekerja = User::factory()->pekerja()->create();
+        $customer = Customer::create([
+            'kode_pelanggan' => 'CUST-001',
+            'nama' => 'Budi Pelanggan',
+            'no_hp' => '0812345678',
+        ]);
+        $service = Service::create([
+            'nama_layanan' => 'Cuci Kering',
+            'jenis' => 'kiloan',
+            'harga' => 6000,
+            'durasi_jam' => 24,
+            'is_active' => true,
+        ]);
+
+        $orderDiterima = Order::create([
+            'kode_order' => 'ORD-TEST-001',
+            'customer_id' => $customer->id,
+            'service_id' => $service->id,
+            'berat_atau_jumlah' => 2,
+            'harga_per_satuan' => 6000,
+            'total_harga' => 12000,
+            'tgl_masuk' => now(),
+            'estimasi_selesai' => now()->addDay(),
+            'status_cucian' => 'diterima',
+            'status_pembayaran' => 'belum_lunas',
+        ]);
+
+        $orderSelesai = Order::create([
+            'kode_order' => 'ORD-TEST-002',
+            'customer_id' => $customer->id,
+            'service_id' => $service->id,
+            'berat_atau_jumlah' => 3,
+            'harga_per_satuan' => 6000,
+            'total_harga' => 18000,
+            'tgl_masuk' => now(),
+            'estimasi_selesai' => now()->addDay(),
+            'status_cucian' => 'selesai',
+            'status_pembayaran' => 'lunas',
+        ]);
+
+        $response = $this->actingAs($pekerja)->get('/orders');
+        $response->assertStatus(200);
+        $response->assertSee('ORD-TEST-001');
+        $response->assertDontSee('ORD-TEST-002');
+
+        // Buka detail order Diterima -> 200 OK
+        $this->actingAs($pekerja)->get(route('orders.show', $orderDiterima))->assertStatus(200);
+
+        // Buka detail order Selesai -> 403 Forbidden
+        $this->actingAs($pekerja)->get(route('orders.show', $orderSelesai))->assertStatus(403);
+    }
 }
