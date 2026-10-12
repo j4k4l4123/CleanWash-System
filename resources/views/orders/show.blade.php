@@ -38,12 +38,14 @@
                     <span>Kirim WA</span>
                 </a>
             @endif
-            <button type="button" onclick="openStatusModal()" class="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-brand-600 rounded-xl hover:bg-brand-700 transition shadow-xs">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                </svg>
-                <span>Update Status Cucian</span>
-            </button>
+            @if(!Auth::user()->isPekerja())
+                <button type="button" onclick="openStatusModal()" class="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-brand-600 rounded-xl hover:bg-brand-700 transition shadow-xs">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                    </svg>
+                    <span>Update Status Cucian</span>
+                </button>
+            @endif
             <a href="{{ route('orders.index') }}" class="px-3 py-2 text-xs font-medium text-slate-500 hover:text-slate-800 transition">
                 Kembali
             </a>
@@ -198,9 +200,11 @@
             <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs space-y-3">
                 <div class="flex items-center justify-between">
                     <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-400">Data Pelanggan</h3>
-                    <a href="{{ route('customers.show', $order->customer) }}" class="text-xs font-semibold text-brand-600 hover:underline">
-                        Lihat Profil
-                    </a>
+                    @if(!Auth::user()->isPekerja())
+                        <a href="{{ route('customers.show', $order->customer) }}" class="text-xs font-semibold text-brand-600 hover:underline">
+                            Lihat Profil
+                        </a>
+                    @endif
                 </div>
 
                 <div class="space-y-1.5 text-sm">
@@ -266,48 +270,52 @@
                             Tagihan sebesar <span class="font-bold">Rp {{ number_format($order->total_harga, 0, ',', '.') }}</span> belum dibayar.
                         </div>
 
-                        <form action="{{ route('payments.store', $order) }}" method="POST" class="space-y-3">
-                            @csrf
-                            <div>
-                                <label class="block text-[11px] font-semibold text-slate-700 uppercase mb-1">Metode Bayar</label>
-                                <select name="metode_pembayaran" id="payMethodSelect" onchange="togglePayInputs()" class="w-full px-3 py-1.5 text-xs bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-brand-500">
-                                    <option value="tunai">Tunai (Cash)</option>
-                                    <option value="qris">QRIS</option>
-                                    <option value="transfer">Transfer Bank</option>
-                                </select>
-                            </div>
-
-                            <div id="uangDiterimaRow">
-                                <label class="block text-[11px] font-semibold text-slate-700 uppercase mb-1">Uang Diterima (Rp)</label>
-                                <input type="number" name="uang_diterima" id="settleUangDiterima" value="{{ $order->total_harga }}" min="{{ $order->total_harga }}" step="500" oninput="calcSettleKembalian()" class="w-full px-3 py-1.5 text-xs bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-brand-500">
-                                <div id="settleKembalianText" class="text-[11px] text-emerald-700 font-semibold mt-1">
-                                    Kembalian: Rp 0
+                        @if(!Auth::user()->isPekerja())
+                            <form action="{{ route('payments.store', $order) }}" method="POST" class="space-y-3">
+                                @csrf
+                                <div>
+                                    <label class="block text-[11px] font-semibold text-slate-700 uppercase mb-1">Metode Bayar</label>
+                                    <select name="metode_pembayaran" id="payMethodSelect" onchange="togglePayInputs()" class="w-full px-3 py-1.5 text-xs bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-brand-500">
+                                        <option value="tunai">Tunai (Cash)</option>
+                                        <option value="qris">QRIS</option>
+                                        <option value="transfer">Transfer Bank</option>
+                                    </select>
                                 </div>
-                            </div>
 
-                            <button type="submit" class="w-full py-2 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition shadow-xs">
-                                Konfirmasi Pembayaran Lunas
-                            </button>
-                        </form>
+                                <div id="uangDiterimaRow">
+                                    <label class="block text-[11px] font-semibold text-slate-700 uppercase mb-1">Uang Diterima (Rp)</label>
+                                    <input type="number" name="uang_diterima" id="settleUangDiterima" value="{{ $order->total_harga }}" min="{{ $order->total_harga }}" step="500" oninput="calcSettleKembalian()" class="w-full px-3 py-1.5 text-xs bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-brand-500">
+                                    <div id="settleKembalianText" class="text-[11px] text-emerald-700 font-semibold mt-1">
+                                        Kembalian: Rp 0
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="w-full py-2 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition shadow-xs">
+                                    Konfirmasi Pembayaran Lunas
+                                </button>
+                            </form>
+                        @endif
                     </div>
                 @endif
             </div>
 
-            <!-- Danger Zone: Delete Order -->
-            <div class="pt-2 flex items-center justify-between text-xs text-slate-400">
-                <a href="{{ route('orders.edit', $order) }}" class="text-slate-600 hover:text-slate-900 underline">
-                    Edit Data Order
-                </a>
-                @if(Auth::user()->isAdmin())
-                    <form action="{{ route('orders.destroy', $order) }}" method="POST" onsubmit="return confirm('Hapus pesanan ini? Seluruh riwayat dan status akan dihapus permanen.');">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="text-rose-500 hover:text-rose-700 hover:underline">
-                            Hapus Order
-                        </button>
-                    </form>
-                @endif
-            </div>
+            @if(!Auth::user()->isPekerja())
+                <!-- Danger Zone: Delete Order -->
+                <div class="pt-2 flex items-center justify-between text-xs text-slate-400">
+                    <a href="{{ route('orders.edit', $order) }}" class="text-slate-600 hover:text-slate-900 underline">
+                        Edit Data Order
+                    </a>
+                    @if(Auth::user()->isAdmin())
+                        <form action="{{ route('orders.destroy', $order) }}" method="POST" onsubmit="return confirm('Hapus pesanan ini? Seluruh riwayat dan status akan dihapus permanen.');">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="text-rose-500 hover:text-rose-700 hover:underline">
+                                Hapus Order
+                            </button>
+                        </form>
+                    @endif
+                </div>
+            @endif
 
         </div>
 
@@ -315,6 +323,7 @@
 
 </div>
 
+@if(!Auth::user()->isPekerja())
 <!-- Modal Update Status Cucian -->
 <div id="statusModal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-200 space-y-4">
@@ -357,6 +366,7 @@
         </form>
     </div>
 </div>
+@endif
 
 @endsection
 

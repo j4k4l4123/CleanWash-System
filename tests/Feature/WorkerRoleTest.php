@@ -139,4 +139,45 @@ class WorkerRoleTest extends TestCase
             'role' => 'kasir',
         ]);
     }
+
+    public function test_pekerja_views_do_not_contain_action_buttons(): void
+    {
+        $pekerja = User::factory()->pekerja()->create();
+        $customer = Customer::create([
+            'kode_pelanggan' => 'CUST-002',
+            'nama' => 'Pelanggan UI',
+            'no_hp' => '0812345678',
+        ]);
+        $service = Service::create([
+            'nama_layanan' => 'Cuci Kering',
+            'jenis' => 'kiloan',
+            'harga' => 6000,
+            'durasi_jam' => 24,
+            'is_active' => true,
+        ]);
+
+        $order = Order::create([
+            'kode_order' => 'ORD-UI-001',
+            'customer_id' => $customer->id,
+            'service_id' => $service->id,
+            'berat_atau_jumlah' => 2,
+            'harga_per_satuan' => 6000,
+            'total_harga' => 12000,
+            'tgl_masuk' => now(),
+            'estimasi_selesai' => now()->addDay(),
+            'status_cucian' => 'diterima',
+            'status_pembayaran' => 'belum_lunas',
+        ]);
+
+        $indexResponse = $this->actingAs($pekerja)->get('/orders');
+        $indexResponse->assertStatus(200);
+        $indexResponse->assertDontSee('Terima Order Baru');
+        $indexResponse->assertDontSee('href="' . route('customers.index') . '"', false);
+
+        $showResponse = $this->actingAs($pekerja)->get(route('orders.show', $order));
+        $showResponse->assertStatus(200);
+        $showResponse->assertDontSee('Update Status Cucian');
+        $showResponse->assertDontSee('Konfirmasi Pembayaran Lunas');
+        $showResponse->assertDontSee(route('orders.edit', $order));
+    }
 }
