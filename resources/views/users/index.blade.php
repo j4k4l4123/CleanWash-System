@@ -36,6 +36,7 @@
                     <option value="">Semua Peran (Role)</option>
                     <option value="admin" {{ $role === 'admin' ? 'selected' : '' }}>Admin / Owner</option>
                     <option value="kasir" {{ $role === 'kasir' ? 'selected' : '' }}>Kasir / Petugas</option>
+                    <option value="pekerja" {{ $role === 'pekerja' ? 'selected' : '' }}>Pekerja Laundry</option>
                 </select>
             </div>
 

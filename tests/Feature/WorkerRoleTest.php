@@ -104,4 +104,39 @@ class WorkerRoleTest extends TestCase
         // Buka detail order Selesai -> 403 Forbidden
         $this->actingAs($pekerja)->get(route('orders.show', $orderSelesai))->assertStatus(403);
     }
+
+    public function test_admin_can_create_and_update_pekerja_user(): void
+    {
+        $admin = User::factory()->admin()->create();
+
+        $response = $this->actingAs($admin)->post('/users', [
+            'name' => 'Staf Baru',
+            'email' => 'staf@laundry.test',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+            'role' => 'pekerja',
+            'no_hp' => '081233344455',
+        ]);
+
+        $response->assertRedirect(route('users.index'));
+        $this->assertDatabaseHas('users', [
+            'email' => 'staf@laundry.test',
+            'role' => 'pekerja',
+        ]);
+
+        $user = User::where('email', 'staf@laundry.test')->first();
+
+        $updateResponse = $this->actingAs($admin)->put(route('users.update', $user), [
+            'name' => 'Staf Diperbarui',
+            'email' => 'staf@laundry.test',
+            'role' => 'kasir',
+            'no_hp' => '081233344455',
+        ]);
+
+        $updateResponse->assertRedirect(route('users.index'));
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'role' => 'kasir',
+        ]);
+    }
 }

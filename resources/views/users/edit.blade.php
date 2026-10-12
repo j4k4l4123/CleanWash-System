@@ -55,12 +55,20 @@
                 <label for="role" class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">
                     Peran / Hak Akses (Role) <span class="text-rose-500">*</span>
                 </label>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <label class="flex items-start gap-3 p-3.5 border rounded-2xl cursor-pointer hover:bg-slate-50 transition border-slate-200">
                         <input type="radio" name="role" value="kasir" class="mt-1 text-brand-600 focus:ring-brand-500" {{ old('role', $user->role) === 'kasir' ? 'checked' : '' }}>
                         <div>
                             <span class="block text-sm font-semibold text-slate-800">Kasir / Petugas</span>
-                            <span class="block text-xs text-slate-500">Bisa input order cucian, ubah status cucian, dan proses pembayaran kasir.</span>
+                            <span class="block text-xs text-slate-500">Bisa input order, ubah status, & proses bayar.</span>
+                        </div>
+                    </label>
+
+                    <label class="flex items-start gap-3 p-3.5 border rounded-2xl cursor-pointer hover:bg-slate-50 transition border-slate-200">
+                        <input type="radio" name="role" value="pekerja" class="mt-1 text-brand-600 focus:ring-brand-500" {{ old('role', $user->role) === 'pekerja' ? 'checked' : '' }}>
+                        <div>
+                            <span class="block text-sm font-semibold text-slate-800">Pekerja Laundry</span>
+                            <span class="block text-xs text-slate-500">Hanya melihat daftar & detail orderan Diterima.</span>
                         </div>
                     </label>
 
@@ -68,7 +76,7 @@
                         <input type="radio" name="role" value="admin" class="mt-1 text-brand-600 focus:ring-brand-500" {{ old('role', $user->role) === 'admin' ? 'checked' : '' }}>
                         <div>
                             <span class="block text-sm font-semibold text-slate-800">Admin / Owner</span>
-                            <span class="block text-xs text-slate-500">Akses penuh: kelola tarif layanan, kelola akun petugas, dan hapus data.</span>
+                            <span class="block text-xs text-slate-500">Akses penuh: kelola tarif, petugas, & hapus data.</span>
                         </div>
                     </label>
                 </div>
