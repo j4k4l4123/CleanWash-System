@@ -12,6 +12,10 @@ class DashboardController extends Controller
 {
     public function index()
     {
+        if (auth()->user()?->isPekerja()) {
+            return redirect()->route('orders.index');
+        }
+
         $today = Carbon::today();
         $startOfMonth = Carbon::now()->startOfMonth();
 

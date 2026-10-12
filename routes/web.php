@@ -23,28 +23,40 @@ Route::middleware('guest')->group(function (): void {
 // Logout (Authenticated Only)
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
-// Protected Routes (Kasir & Admin Laundry)
+// Protected Routes (Semua Pengguna Terotentikasi)
 Route::middleware('auth')->group(function (): void {
-    // Dashboard
+    // Dashboard (Dialihkan ke orders.index jika role pekerja)
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard', [DashboardController::class, 'index']);
 
-    // Pelanggan (Customer Management)
-    Route::resource('customers', CustomerController::class)->except(['destroy']);
-    Route::post('/api/customers/quick-create', [CustomerController::class, 'quickStore'])->name('customers.quick-store');
+    // Order Cucian (Daftar Order bisa diakses Pekerja, Kasir, Admin)
+    Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
 
-    // Layanan (Lihat Katalog untuk Kasir & Admin)
-    Route::get('/services', [ServiceController::class, 'index'])->name('services.index');
+    // Khusus Kasir & Admin (Role: Admin, Kasir)
+    Route::middleware('role:admin,kasir')->group(function (): void {
+        // Pelanggan (Customer Management)
+        Route::resource('customers', CustomerController::class)->except(['destroy']);
+        Route::post('/api/customers/quick-create', [CustomerController::class, 'quickStore'])->name('customers.quick-store');
 
-    // Order Cucian
-    Route::resource('orders', OrderController::class)->except(['destroy']);
-    Route::post('/orders/{order}/update-status', [OrderController::class, 'updateStatus'])->name('orders.update-status');
-    Route::get('/orders/{order}/print', [OrderController::class, 'print'])->name('orders.print');
+        // Layanan (Lihat Katalog untuk Kasir & Admin)
+        Route::get('/services', [ServiceController::class, 'index'])->name('services.index');
 
-    // Pembayaran
-    Route::get('/payments', [PaymentController::class, 'index'])->name('payments.index');
-    Route::post('/orders/{order}/pay', [PaymentController::class, 'store'])->name('payments.store');
-    Route::get('/payments/{payment}/receipt', [PaymentController::class, 'receipt'])->name('payments.receipt');
+        // Transaksi & Status Order
+        Route::get('/orders/create', [OrderController::class, 'create'])->name('orders.create');
+        Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
+        Route::get('/orders/{order}/edit', [OrderController::class, 'edit'])->name('orders.edit');
+        Route::put('/orders/{order}', [OrderController::class, 'update'])->name('orders.update');
+        Route::post('/orders/{order}/update-status', [OrderController::class, 'updateStatus'])->name('orders.update-status');
+        Route::get('/orders/{order}/print', [OrderController::class, 'print'])->name('orders.print');
+
+        // Pembayaran
+        Route::get('/payments', [PaymentController::class, 'index'])->name('payments.index');
+        Route::post('/orders/{order}/pay', [PaymentController::class, 'store'])->name('payments.store');
+        Route::get('/payments/{payment}/receipt', [PaymentController::class, 'receipt'])->name('payments.receipt');
+    });
+
+    // Detail Order Cucian (Bisa diakses Pekerja, Kasir, Admin)
+    Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
 
     // Khusus Admin / Owner (Role: Admin)
     Route::middleware('role:admin')->group(function (): void {

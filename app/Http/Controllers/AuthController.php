@@ -36,7 +36,8 @@ class AuthController extends Controller
         if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
 
-            $intended = session()->pull('url.intended', route('dashboard'));
+            $defaultRedirect = Auth::user()->isPekerja() ? route('orders.index') : route('dashboard');
+            $intended = session()->pull('url.intended', $defaultRedirect);
             if (is_string($intended) && str_starts_with($intended, 'http://') && ! str_contains($intended, 'localhost') && ! str_contains($intended, '127.0.0.1')) {
                 $intended = preg_replace('/^http:/i', 'https:', $intended);
             }
