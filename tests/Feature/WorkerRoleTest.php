@@ -172,7 +172,7 @@ class WorkerRoleTest extends TestCase
         $indexResponse = $this->actingAs($pekerja)->get('/orders');
         $indexResponse->assertStatus(200);
         $indexResponse->assertDontSee('Terima Order Baru');
-        $indexResponse->assertDontSee('href="' . route('customers.index') . '"', false);
+        $indexResponse->assertDontSee('href="'.route('customers.index').'"', false);
 
         $showResponse = $this->actingAs($pekerja)->get(route('orders.show', $order));
         $showResponse->assertStatus(200);
