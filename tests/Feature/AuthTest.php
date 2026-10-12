@@ -22,6 +22,8 @@ class AuthTest extends TestCase
         $response->assertSee('Masuk ke Sistem');
         $response->assertDontSee('Akun Default Demo:');
         $response->assertDontSee('admin@laundry.test');
+        $response->assertDontSee('Bukan petugas laundry?');
+        $response->assertDontSee('Lacak cucian Anda di sini');
     }
 
     /**
