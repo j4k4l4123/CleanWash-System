@@ -15,9 +15,11 @@
                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border {{ $order->status_badge_class }}">
                     {{ $order->status_label }}
                 </span>
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border {{ $order->payment_badge_class }}">
-                    {{ $order->status_pembayaran === 'lunas' ? 'LUNAS' : 'BELUM LUNAS' }}
-                </span>
+                @if(!Auth::user()->isPekerja())
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border {{ $order->payment_badge_class }}">
+                        {{ $order->status_pembayaran === 'lunas' ? 'LUNAS' : 'BELUM LUNAS' }}
+                    </span>
+                @endif
             </div>
             <p class="text-xs text-slate-500 mt-1.5">
                 Order masuk pada {{ $order->tgl_masuk->isoFormat('dddd, D MMMM Y - HH:mm') }} WIB
@@ -229,52 +231,52 @@
                 </div>
             </div>
 
-            <!-- Payment Status & Settlement Box -->
-            <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs space-y-4">
-                <div class="flex items-center justify-between">
-                    <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-400">Status Pembayaran</h3>
-                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border {{ $order->payment_badge_class }}">
-                        {{ $order->status_pembayaran === 'lunas' ? 'LUNAS' : 'BELUM LUNAS' }}
-                    </span>
-                </div>
-
-                @if($order->status_pembayaran === 'lunas')
-                    @php $pay = $order->payment; @endphp
-                    <div class="p-4 rounded-xl bg-emerald-50 border border-emerald-200 space-y-2 text-xs text-emerald-900">
-                        <div class="flex items-center justify-between font-mono">
-                            <span>No Invoice:</span>
-                            <span class="font-bold">{{ $pay ? $pay->kode_pembayaran : '-' }}</span>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <span>Metode:</span>
-                            <span class="font-semibold uppercase">{{ $order->metode_pembayaran ?? ($pay ? $pay->metode_pembayaran : '-') }}</span>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <span>Jumlah Bayar:</span>
-                            <span class="font-bold font-mono">Rp {{ number_format($order->total_harga, 0, ',', '.') }}</span>
-                        </div>
-                        @if($pay && $pay->uang_diterima && $pay->metode_pembayaran === 'tunai')
-                            <div class="flex items-center justify-between text-slate-600 border-t border-emerald-200 pt-1">
-                                <span>Uang Diterima:</span>
-                                <span>Rp {{ number_format($pay->uang_diterima, 0, ',', '.') }}</span>
-                            </div>
-                            <div class="flex items-center justify-between text-slate-600">
-                                <span>Kembalian:</span>
-                                <span>Rp {{ number_format($pay->kembalian, 0, ',', '.') }}</span>
-                            </div>
-                        @endif
-                        <div class="pt-2 text-slate-500 text-[11px]">
-                            Dibayar pada: {{ $pay ? $pay->tgl_bayar->isoFormat('D MMM Y, HH:mm') : $order->updated_at->isoFormat('D MMM Y, HH:mm') }} WIB
-                        </div>
+            @if(!Auth::user()->isPekerja())
+                <!-- Payment Status & Settlement Box -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-400">Status Pembayaran</h3>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border {{ $order->payment_badge_class }}">
+                            {{ $order->status_pembayaran === 'lunas' ? 'LUNAS' : 'BELUM LUNAS' }}
+                        </span>
                     </div>
-                @else
-                    <!-- Settle Payment Form -->
-                    <div class="p-4 rounded-xl bg-rose-50/70 border border-rose-200 space-y-3">
-                        <div class="text-xs text-rose-800 font-medium">
-                            Tagihan sebesar <span class="font-bold">Rp {{ number_format($order->total_harga, 0, ',', '.') }}</span> belum dibayar.
-                        </div>
 
-                        @if(!Auth::user()->isPekerja())
+                    @if($order->status_pembayaran === 'lunas')
+                        @php $pay = $order->payment; @endphp
+                        <div class="p-4 rounded-xl bg-emerald-50 border border-emerald-200 space-y-2 text-xs text-emerald-900">
+                            <div class="flex items-center justify-between font-mono">
+                                <span>No Invoice:</span>
+                                <span class="font-bold">{{ $pay ? $pay->kode_pembayaran : '-' }}</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span>Metode:</span>
+                                <span class="font-semibold uppercase">{{ $order->metode_pembayaran ?? ($pay ? $pay->metode_pembayaran : '-') }}</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span>Jumlah Bayar:</span>
+                                <span class="font-bold font-mono">Rp {{ number_format($order->total_harga, 0, ',', '.') }}</span>
+                            </div>
+                            @if($pay && $pay->uang_diterima && $pay->metode_pembayaran === 'tunai')
+                                <div class="flex items-center justify-between text-slate-600 border-t border-emerald-200 pt-1">
+                                    <span>Uang Diterima:</span>
+                                    <span>Rp {{ number_format($pay->uang_diterima, 0, ',', '.') }}</span>
+                                </div>
+                                <div class="flex items-center justify-between text-slate-600">
+                                    <span>Kembalian:</span>
+                                    <span>Rp {{ number_format($pay->kembalian, 0, ',', '.') }}</span>
+                                </div>
+                            @endif
+                            <div class="pt-2 text-slate-500 text-[11px]">
+                                Dibayar pada: {{ $pay ? $pay->tgl_bayar->isoFormat('D MMM Y, HH:mm') : $order->updated_at->isoFormat('D MMM Y, HH:mm') }} WIB
+                            </div>
+                        </div>
+                    @else
+                        <!-- Settle Payment Form -->
+                        <div class="p-4 rounded-xl bg-rose-50/70 border border-rose-200 space-y-3">
+                            <div class="text-xs text-rose-800 font-medium">
+                                Tagihan sebesar <span class="font-bold">Rp {{ number_format($order->total_harga, 0, ',', '.') }}</span> belum dibayar.
+                            </div>
+
                             <form action="{{ route('payments.store', $order) }}" method="POST" class="space-y-3">
                                 @csrf
                                 <div>
@@ -298,10 +300,10 @@
                                     Konfirmasi Pembayaran Lunas
                                 </button>
                             </form>
-                        @endif
-                    </div>
-                @endif
-            </div>
+                        </div>
+                    @endif
+                </div>
+            @endif
 
             @if(!Auth::user()->isPekerja())
                 <!-- Danger Zone: Delete Order -->

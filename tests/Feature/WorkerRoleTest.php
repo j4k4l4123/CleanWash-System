@@ -173,20 +173,31 @@ class WorkerRoleTest extends TestCase
         $indexResponse->assertStatus(200);
         $indexResponse->assertDontSee('Terima Order Baru');
         $indexResponse->assertDontSee('href="'.route('customers.index').'"', false);
+        $indexResponse->assertDontSee('name="status_pembayaran"', false);
+        $indexResponse->assertDontSee('Belum Lunas');
 
         $showResponse = $this->actingAs($pekerja)->get(route('orders.show', $order));
         $showResponse->assertStatus(200);
         $showResponse->assertDontSee('Update Status Cucian');
         $showResponse->assertDontSee('Konfirmasi Pembayaran Lunas');
+        $showResponse->assertDontSee('Status Pembayaran');
+        $showResponse->assertDontSee('BELUM LUNAS');
         $showResponse->assertDontSee(route('orders.edit', $order));
         $showResponse->assertDontSee('Kirim WA');
         $showResponse->assertDontSee('https://wa.me/', false);
 
-        // Kasir tetap bisa melihat tombol Kirim WA
+        // Kasir tetap bisa melihat tombol Kirim WA dan informasi pembayaran
         $kasir = User::factory()->kasir()->create();
+        $kasirIndexResponse = $this->actingAs($kasir)->get('/orders');
+        $kasirIndexResponse->assertStatus(200);
+        $kasirIndexResponse->assertSee('name="status_pembayaran"', false);
+        $kasirIndexResponse->assertSee('Belum Lunas');
+
         $kasirResponse = $this->actingAs($kasir)->get(route('orders.show', $order));
         $kasirResponse->assertStatus(200);
         $kasirResponse->assertSee('Kirim WA');
         $kasirResponse->assertSee('https://wa.me/', false);
+        $kasirResponse->assertSee('Status Pembayaran');
+        $kasirResponse->assertSee('BELUM LUNAS');
     }
 }
