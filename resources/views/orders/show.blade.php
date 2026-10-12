@@ -30,7 +30,7 @@
                 $cleanPhone = str_starts_with($rawPhone, '0') ? '62' . substr($rawPhone, 1) : $rawPhone;
                 $waText = "Halo Kak {$order->customer->nama},\n\nUpdate pesanan cucian Anda di CleanWash Laundry:\nNo. Order: {$order->kode_order}\nStatus: {$order->status_label}\nTotal Tagihan: Rp " . number_format($order->total_harga, 0, ',', '.') . " (" . ($order->status_pembayaran === 'lunas' ? 'LUNAS' : 'BELUM LUNAS') . ")\n\nCek progres cucian online di:\n" . url('/tracking/' . $order->kode_order) . "\n\nTerima kasih!";
             @endphp
-            @if($cleanPhone)
+            @if($cleanPhone && !Auth::user()->isPekerja())
                 <a href="https://wa.me/{{ $cleanPhone }}?text={{ rawurlencode($waText) }}" target="_blank" class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-300 rounded-xl hover:bg-emerald-100 transition shadow-xs" title="Kirim Notifikasi Status via WhatsApp">
                     <svg class="w-4 h-4 text-emerald-600" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.669-.699c.969.54 1.772.84 2.79.84h.001c3.181 0 5.768-2.586 5.768-5.766 0-3.18-2.587-5.766-5.768-5.766zm9.969 5.828c0 5.519-4.481 10-10 10-1.748 0-3.385-.45-4.817-1.238l-7.183 1.88 1.914-6.994c-.878-1.492-1.384-3.232-1.384-5.088 0-5.519 4.481-10 10-10s10 4.481 10 10z"/>
@@ -211,13 +211,17 @@
                     <div class="font-bold text-slate-900">{{ $order->customer->nama }}</div>
                     <div class="font-mono text-xs text-brand-700 font-medium">{{ $order->customer->kode_pelanggan }}</div>
                     <div class="text-xs text-slate-600 flex items-center justify-between gap-1">
-                        <a href="https://wa.me/{{ $cleanPhone }}?text={{ rawurlencode($waText) }}" target="_blank" class="flex items-center gap-1 text-slate-700 hover:text-emerald-700 font-medium hover:underline" title="Chat WhatsApp Pelanggan">
-                            <svg class="w-3.5 h-3.5 text-emerald-500" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.669-.699c.969.54 1.772.84 2.79.84h.001c3.181 0 5.768-2.586 5.768-5.766 0-3.18-2.587-5.766-5.768-5.766zm9.969 5.828c0 5.519-4.481 10-10 10-1.748 0-3.385-.45-4.817-1.238l-7.183 1.88 1.914-6.994c-.878-1.492-1.384-3.232-1.384-5.088 0-5.519 4.481-10 10-10s10 4.481 10 10z"/>
-                            </svg>
-                            <span>{{ $order->customer->no_hp }}</span>
-                        </a>
-                        <span class="text-[10px] text-emerald-600 font-semibold bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">WA Aktif</span>
+                        @if(!Auth::user()->isPekerja())
+                            <a href="https://wa.me/{{ $cleanPhone }}?text={{ rawurlencode($waText) }}" target="_blank" class="flex items-center gap-1 text-slate-700 hover:text-emerald-700 font-medium hover:underline" title="Chat WhatsApp Pelanggan">
+                                <svg class="w-3.5 h-3.5 text-emerald-500" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.669-.699c.969.54 1.772.84 2.79.84h.001c3.181 0 5.768-2.586 5.768-5.766 0-3.18-2.587-5.766-5.768-5.766zm9.969 5.828c0 5.519-4.481 10-10 10-1.748 0-3.385-.45-4.817-1.238l-7.183 1.88 1.914-6.994c-.878-1.492-1.384-3.232-1.384-5.088 0-5.519 4.481-10 10-10s10 4.481 10 10z"/>
+                                </svg>
+                                <span>{{ $order->customer->no_hp }}</span>
+                            </a>
+                            <span class="text-[10px] text-emerald-600 font-semibold bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">WA Aktif</span>
+                        @else
+                            <span class="font-mono text-slate-600">{{ $order->customer->no_hp }}</span>
+                        @endif
                     </div>
                     @if($order->customer->alamat)
                         <div class="text-xs text-slate-500 pt-1 border-t border-slate-100">{{ $order->customer->alamat }}</div>

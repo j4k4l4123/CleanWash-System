@@ -179,5 +179,14 @@ class WorkerRoleTest extends TestCase
         $showResponse->assertDontSee('Update Status Cucian');
         $showResponse->assertDontSee('Konfirmasi Pembayaran Lunas');
         $showResponse->assertDontSee(route('orders.edit', $order));
+        $showResponse->assertDontSee('Kirim WA');
+        $showResponse->assertDontSee('https://wa.me/', false);
+
+        // Kasir tetap bisa melihat tombol Kirim WA
+        $kasir = User::factory()->kasir()->create();
+        $kasirResponse = $this->actingAs($kasir)->get(route('orders.show', $order));
+        $kasirResponse->assertStatus(200);
+        $kasirResponse->assertSee('Kirim WA');
+        $kasirResponse->assertSee('https://wa.me/', false);
     }
 }
