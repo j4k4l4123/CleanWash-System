@@ -18,7 +18,7 @@
 - Modify: `database/seeders/DatabaseSeeder.php`
 - Test: `tests/Unit/UserRoleTest.php`
 
-- [ ] **Step 1: Write the failing unit test for User role helpers**
+- [x] **Step 1: Write the failing unit test for User role helpers**
 
 Buat file test `tests/Unit/UserRoleTest.php`:
 ```php
@@ -50,12 +50,12 @@ class UserRoleTest extends TestCase
 }
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `php artisan test tests/Unit/UserRoleTest.php`
 Expected: FAIL (Call to undefined method `isPekerja()`, role_label returns 'Kasir / Petugas')
 
-- [ ] **Step 3: Update User model, UserFactory, and DatabaseSeeder**
+- [x] **Step 3: Update User model, UserFactory, and DatabaseSeeder**
 
 Modifikasi `app/Models/User.php`:
 ```php
@@ -120,17 +120,17 @@ Tambahkan input akun pekerja default:
         );
 ```
 
-- [ ] **Step 4: Run unit test to verify it passes**
+- [x] **Step 4: Run unit test to verify it passes**
 
 Run: `php artisan test tests/Unit/UserRoleTest.php`
 Expected: PASS
 
-- [ ] **Step 5: Run Database Seeder to insert pekerja data**
+- [x] **Step 5: Run Database Seeder to insert pekerja data**
 
 Run: `php artisan db:seed --class=DatabaseSeeder`
 Expected: SUCCESS
 
-- [ ] **Step 6: Commit changes**
+- [x] **Step 6: Commit changes**
 
 ```bash
 git add app/Models/User.php database/factories/UserFactory.php database/seeders/DatabaseSeeder.php tests/Unit/UserRoleTest.php
@@ -147,7 +147,7 @@ git commit -m "feat: add isPekerja helper, factory state, and seed data"
 - Modify: `app/Http/Controllers/DashboardController.php`
 - Test: `tests/Feature/WorkerRoleTest.php`
 
-- [ ] **Step 1: Write failing tests for worker routing and redirect**
+- [x] **Step 1: Write failing tests for worker routing and redirect**
 
 Buat file test `tests/Feature/WorkerRoleTest.php`:
 ```php
@@ -206,12 +206,12 @@ class WorkerRoleTest extends TestCase
 }
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `php artisan test tests/Feature/WorkerRoleTest.php`
 Expected: FAIL (Redirects to dashboard instead of orders, and 200 OK on restricted modules)
 
-- [ ] **Step 3: Update routes and controllers**
+- [x] **Step 3: Update routes and controllers**
 
 Modifikasi `routes/web.php`:
 Bagi rute terproteksi menjadi rute bersama (`orders.index`, `orders.show`, `dashboard`), rute `role:admin,kasir`, dan rute `role:admin`:
@@ -297,12 +297,12 @@ Modifikasi `app/Http/Controllers/DashboardController.php` di dalam `index()`:
         // ... sisa kode dashboard ...
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `php artisan test tests/Feature/WorkerRoleTest.php`
 Expected: PASS (3 tests pass)
 
-- [ ] **Step 5: Commit changes**
+- [x] **Step 5: Commit changes**
 
 ```bash
 git add routes/web.php app/Http/Controllers/AuthController.php app/Http/Controllers/DashboardController.php tests/Feature/WorkerRoleTest.php
@@ -317,7 +317,7 @@ git commit -m "feat: restrict routes and redirect pekerja to orders"
 - Modify: `app/Http/Controllers/OrderController.php`
 - Modify: `tests/Feature/WorkerRoleTest.php`
 
-- [ ] **Step 1: Write failing tests for order data scoping**
+- [x] **Step 1: Write failing tests for order data scoping**
 
 Tambahkan method test baru di `tests/Feature/WorkerRoleTest.php`:
 ```php
@@ -376,12 +376,12 @@ Tambahkan method test baru di `tests/Feature/WorkerRoleTest.php`:
     }
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `php artisan test --filter=test_pekerja_only_sees_orders_with_status_diterima`
 Expected: FAIL (`ORD-TEST-002` still seen, or status 200 instead of 403 on selesai detail)
 
-- [ ] **Step 3: Update OrderController query scoping & detail check**
+- [x] **Step 3: Update OrderController query scoping & detail check**
 
 Modifikasi `app/Http/Controllers/OrderController.php`:
 Di `index()`:
@@ -412,12 +412,12 @@ Di `show()`:
     }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `php artisan test tests/Feature/WorkerRoleTest.php`
 Expected: PASS
 
-- [ ] **Step 5: Commit changes**
+- [x] **Step 5: Commit changes**
 
 ```bash
 git add app/Http/Controllers/OrderController.php tests/Feature/WorkerRoleTest.php
@@ -435,7 +435,7 @@ git commit -m "feat: enforce order scoping to diterima status for pekerja"
 - Modify: `resources/views/users/index.blade.php`
 - Test: `tests/Feature/WorkerRoleTest.php`
 
-- [ ] **Step 1: Write test for admin managing pekerja user**
+- [x] **Step 1: Write test for admin managing pekerja user**
 
 Tambahkan method test di `tests/Feature/WorkerRoleTest.php`:
 ```php
@@ -475,12 +475,12 @@ Tambahkan method test di `tests/Feature/WorkerRoleTest.php`:
     }
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `php artisan test --filter=test_admin_can_create_and_update_pekerja_user`
 Expected: FAIL (The selected role is invalid, validation fails on `in:admin,kasir`)
 
-- [ ] **Step 3: Update UserController and User views**
+- [x] **Step 3: Update UserController and User views**
 
 Modifikasi `app/Http/Controllers/UserController.php`:
 Ubah validasi pada `store()` dan `update()`:
@@ -506,12 +506,12 @@ Tambahkan opsi pada dropdown filter:
 <option value="pekerja" {{ $role === 'pekerja' ? 'selected' : '' }}>Pekerja Laundry</option>
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `php artisan test --filter=test_admin_can_create_and_update_pekerja_user`
 Expected: PASS
 
-- [ ] **Step 5: Commit changes**
+- [x] **Step 5: Commit changes**
 
 ```bash
 git add app/Http/Controllers/UserController.php resources/views/users/create.blade.php resources/views/users/edit.blade.php resources/views/users/index.blade.php tests/Feature/WorkerRoleTest.php
@@ -528,7 +528,7 @@ git commit -m "feat: support pekerja role in user management forms"
 - Modify: `resources/views/orders/show.blade.php`
 - Test: `tests/Feature/WorkerRoleTest.php`
 
-- [ ] **Step 1: Write test for UI restrictions on pekerja**
+- [x] **Step 1: Write test for UI restrictions on pekerja**
 
 Tambahkan method test di `tests/Feature/WorkerRoleTest.php`:
 ```php
@@ -574,12 +574,12 @@ Tambahkan method test di `tests/Feature/WorkerRoleTest.php`:
     }
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `php artisan test --filter=test_pekerja_views_do_not_contain_action_buttons`
 Expected: FAIL (Elements are still visible)
 
-- [ ] **Step 3: Update Blade templates**
+- [x] **Step 3: Update Blade templates**
 
 Modifikasi `resources/views/layouts/app.blade.php`:
 1. Brand Logo URL:
@@ -604,12 +604,12 @@ Modifikasi `resources/views/orders/show.blade.php`:
 2. Sembunyikan link "Lihat Profil" pelanggan jika `Auth::user()->isPekerja()`.
 3. Sembunyikan form "Konfirmasi Pembayaran Lunas" dan link edit order jika `Auth::user()->isPekerja()`.
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `php artisan test --filter=test_pekerja_views_do_not_contain_action_buttons`
 Expected: PASS
 
-- [ ] **Step 5: Commit changes**
+- [x] **Step 5: Commit changes**
 
 ```bash
 git add resources/views/layouts/app.blade.php resources/views/orders/index.blade.php resources/views/orders/show.blade.php tests/Feature/WorkerRoleTest.php
@@ -623,17 +623,17 @@ git commit -m "feat: adjust views to hide unauthorized actions for pekerja"
 **Files:**
 - None (Verifikasi & Formatting)
 
-- [ ] **Step 1: Run code formatter Pint**
+- [x] **Step 1: Run code formatter Pint**
 
 Run: `vendor/bin/pint --format agent`
 Expected: 0 errors / clean formatting
 
-- [ ] **Step 2: Run all tests in test suite**
+- [x] **Step 2: Run all tests in test suite**
 
 Run: `php artisan test`
 Expected: 100% tests PASS (all tests including existing and new ones)
 
-- [ ] **Step 3: Verify user account in database**
+- [x] **Step 3: Verify user account in database**
 
 Run tinker to ensure pekerja user exists:
 ```bash
@@ -641,7 +641,7 @@ php artisan tinker --execute 'echo User::where("role", "pekerja")->first()?->ema
 ```
 Expected: `pekerja@laundry.test`
 
-- [ ] **Step 4: Commit any remaining changes**
+- [x] **Step 4: Commit any remaining changes**
 
 ```bash
 git add .
