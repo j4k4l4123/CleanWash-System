@@ -200,4 +200,40 @@ class WorkerRoleTest extends TestCase
         $kasirResponse->assertSee('Status Pembayaran');
         $kasirResponse->assertSee('BELUM LUNAS');
     }
+
+    public function test_pekerja_can_see_order_notes_in_order_list_table(): void
+    {
+        $pekerja = User::factory()->pekerja()->create();
+        $customer = Customer::create([
+            'kode_pelanggan' => 'CUST-NOTE-01',
+            'nama' => 'Rina Catatan',
+            'no_hp' => '081234567811',
+        ]);
+        $service = Service::create([
+            'nama_layanan' => 'Cuci Kering',
+            'jenis' => 'kiloan',
+            'harga' => 6000,
+            'durasi_jam' => 24,
+            'is_active' => true,
+        ]);
+
+        Order::create([
+            'kode_order' => 'ORD-NOTE-001',
+            'customer_id' => $customer->id,
+            'service_id' => $service->id,
+            'berat_atau_jumlah' => 2,
+            'harga_per_satuan' => 6000,
+            'total_harga' => 12000,
+            'tgl_masuk' => now(),
+            'estimasi_selesai' => now()->addDay(),
+            'status_cucian' => 'diterima',
+            'status_pembayaran' => 'belum_lunas',
+            'catatan' => 'Jangan pakai pewangi mawar, alergi',
+        ]);
+
+        $response = $this->actingAs($pekerja)->get('/orders');
+        $response->assertStatus(200);
+        $response->assertSee('Catatan');
+        $response->assertSee('Jangan pakai pewangi mawar, alergi');
+    }
 }

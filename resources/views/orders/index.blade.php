@@ -84,6 +84,7 @@
                         <th class="px-5 py-3.5">Berat / Qty</th>
                         <th class="px-5 py-3.5">Total Biaya</th>
                         <th class="px-5 py-3.5">Status Cucian</th>
+                        <th class="px-5 py-3.5">Catatan</th>
                         @if(!Auth::user()->isPekerja())
                             <th class="px-5 py-3.5">Pembayaran</th>
                         @endif
@@ -132,6 +133,15 @@
                                     </button>
                                 @endif
                             </td>
+                            <td class="px-5 py-4 text-xs">
+                                @if($order->catatan)
+                                    <div class="inline-block max-w-xs px-2.5 py-1 rounded-lg bg-amber-50 text-amber-900 border border-amber-200 text-xs font-medium break-words leading-relaxed">
+                                        {{ $order->catatan }}
+                                    </div>
+                                @else
+                                    <span class="text-slate-400 italic text-xs">-</span>
+                                @endif
+                            </td>
                             @if(!Auth::user()->isPekerja())
                                 <td class="px-5 py-4">
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border {{ $order->payment_badge_class }}">
@@ -149,7 +159,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="{{ Auth::user()->isPekerja() ? 8 : 9 }}" class="px-5 py-8 text-center text-slate-400">
+                            <td colspan="{{ Auth::user()->isPekerja() ? 9 : 10 }}" class="px-5 py-8 text-center text-slate-400">
                                 Tidak ada data order cucian yang sesuai dengan filter.
                             </td>
                         </tr>
