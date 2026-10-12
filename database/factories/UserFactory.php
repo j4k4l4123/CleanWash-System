@@ -62,4 +62,14 @@ class UserFactory extends Factory
             'role' => 'kasir',
         ]);
     }
+
+    /**
+     * Indicate that the user is a pekerja.
+     */
+    public function pekerja(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'pekerja',
+        ]);
+    }
 }
