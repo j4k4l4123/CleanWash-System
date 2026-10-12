@@ -6,6 +6,7 @@ use App\Models\Order;
 use App\Models\Payment;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class PaymentController extends Controller
@@ -40,10 +41,27 @@ class PaymentController extends Controller
 
         $payments = $query->latest('tgl_bayar')->paginate(10)->withQueryString();
 
-        $totalRevenue = Payment::where('status', 'lunas')->sum('jumlah_bayar');
-        $cashRevenue = Payment::where('status', 'lunas')->where('metode_pembayaran', 'tunai')->sum('jumlah_bayar');
-        $qrisRevenue = Payment::where('status', 'lunas')->where('metode_pembayaran', 'qris')->sum('jumlah_bayar');
-        $transferRevenue = Payment::where('status', 'lunas')->where('metode_pembayaran', 'transfer')->sum('jumlah_bayar');
+        $revenueStats = Cache::remember('payments_revenue_stats', 60, function () {
+            $raw = Payment::where('status', 'lunas')
+                ->selectRaw("
+                    COALESCE(SUM(jumlah_bayar), 0) as total_revenue,
+                    COALESCE(SUM(CASE WHEN metode_pembayaran = 'tunai' THEN jumlah_bayar ELSE 0 END), 0) as cash_revenue,
+                    COALESCE(SUM(CASE WHEN metode_pembayaran = 'qris' THEN jumlah_bayar ELSE 0 END), 0) as qris_revenue,
+                    COALESCE(SUM(CASE WHEN metode_pembayaran = 'transfer' THEN jumlah_bayar ELSE 0 END), 0) as transfer_revenue
+                ")->first();
+
+            return [
+                'total_revenue' => (float) ($raw->total_revenue ?? 0),
+                'cash_revenue' => (float) ($raw->cash_revenue ?? 0),
+                'qris_revenue' => (float) ($raw->qris_revenue ?? 0),
+                'transfer_revenue' => (float) ($raw->transfer_revenue ?? 0),
+            ];
+        });
+
+        $totalRevenue = (float) ($revenueStats['total_revenue'] ?? 0);
+        $cashRevenue = (float) ($revenueStats['cash_revenue'] ?? 0);
+        $qrisRevenue = (float) ($revenueStats['qris_revenue'] ?? 0);
+        $transferRevenue = (float) ($revenueStats['transfer_revenue'] ?? 0);
 
         return view('payments.index', compact(
             'payments',
@@ -75,7 +93,8 @@ class PaymentController extends Controller
 
         $kembalian = max(0, $uangDiterima - $totalHarga);
         $dateCode = Carbon::now()->format('Ymd');
-        $paymentCount = Payment::whereDate('tgl_bayar', Carbon::today())->count();
+        $todayStart = Carbon::today()->startOfDay();
+        $paymentCount = Payment::where('tgl_bayar', '>=', $todayStart)->count();
         $kodePembayaran = 'INV-'.$dateCode.'-'.str_pad($paymentCount + 1, 3, '0', STR_PAD_LEFT);
 
         DB::beginTransaction();
@@ -98,6 +117,7 @@ class PaymentController extends Controller
             ]);
 
             DB::commit();
+            $this->clearPaymentCache();
 
             return redirect()->route('orders.show', $order)
                 ->with('success', "Pembayaran untuk {$order->kode_order} berhasil diproses (No Invoice: {$payment->kode_pembayaran})!");
@@ -113,5 +133,11 @@ class PaymentController extends Controller
         $payment->load(['order.customer', 'order.service']);
 
         return view('payments.receipt', compact('payment'));
+    }
+
+    protected function clearPaymentCache(): void
+    {
+        Cache::forget('dashboard_stats');
+        Cache::forget('payments_revenue_stats');
     }
 }

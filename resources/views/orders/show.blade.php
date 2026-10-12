@@ -152,7 +152,7 @@
 
                 @if($order->catatan)
                     <div class="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-900">
-                        <span class="font-bold">Catatan Kasir / Permintaan Khusus:</span>
+                        <span class="font-bold">Catatan Pelanggan:</span>
                         <p class="mt-0.5">{{ $order->catatan }}</p>
                     </div>
                 @endif

@@ -161,4 +161,47 @@ class LaundryFlowTest extends TestCase
         $response->assertDontSee('3. Dikeringkan');
         $response->assertDontSee('4. Disetrika');
     }
+
+    public function test_update_status_from_index_redirects_to_orders_index(): void
+    {
+        $user = User::factory()->create();
+        $customer = Customer::create(['kode_pelanggan' => 'CUST-004', 'nama' => 'Joko', 'no_hp' => '081234567894']);
+        $service = Service::create([
+            'nama_layanan' => 'Cuci Kiloan Regular',
+            'jenis' => 'kiloan',
+            'harga' => 8000,
+            'durasi_jam' => 24,
+            'is_active' => true,
+        ]);
+        $order = Order::create([
+            'kode_order' => 'ORD-TEST-004',
+            'customer_id' => $customer->id,
+            'service_id' => $service->id,
+            'berat_atau_jumlah' => 3,
+            'harga_per_satuan' => 8000,
+            'total_harga' => 24000,
+            'tgl_masuk' => now(),
+            'estimasi_selesai' => now()->addDay(),
+            'status_cucian' => 'diterima',
+            'status_pembayaran' => 'belum_lunas',
+        ]);
+
+        $response = $this->actingAs($user)
+            ->from(route('orders.index'))
+            ->post(route('orders.update-status', $order), [
+                'status_cucian' => 'siap_diambil',
+                'redirect_to' => 'index',
+                'keterangan' => 'Sudah selesai dicuci',
+            ]);
+
+        $response->assertRedirect(route('orders.index'));
+        $this->assertDatabaseHas('orders', [
+            'id' => $order->id,
+            'status_cucian' => 'siap_diambil',
+        ]);
+        $this->assertDatabaseHas('order_status_logs', [
+            'order_id' => $order->id,
+            'status' => 'siap_diambil',
+        ]);
+    }
 }

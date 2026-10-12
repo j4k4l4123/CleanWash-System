@@ -33,7 +33,7 @@ class ServiceController extends Controller
         $validated['is_active'] = $request->has('is_active');
 
         $service = Service::create($validated);
-        Cache::forget('active_services');
+        $this->clearServiceCache();
 
         return redirect()->route('services.index')
             ->with('success', "Layanan {$service->nama_layanan} berhasil ditambahkan!");
@@ -57,7 +57,7 @@ class ServiceController extends Controller
         $validated['is_active'] = $request->has('is_active');
 
         $service->update($validated);
-        Cache::forget('active_services');
+        $this->clearServiceCache();
 
         return redirect()->route('services.index')
             ->with('success', "Layanan {$service->nama_layanan} berhasil diperbarui!");
@@ -71,7 +71,7 @@ class ServiceController extends Controller
         }
 
         $service->delete();
-        Cache::forget('active_services');
+        $this->clearServiceCache();
 
         return redirect()->route('services.index')
             ->with('success', 'Layanan berhasil dihapus.');
@@ -80,10 +80,15 @@ class ServiceController extends Controller
     public function toggle(Service $service)
     {
         $service->update(['is_active' => ! $service->is_active]);
-        Cache::forget('active_services');
+        $this->clearServiceCache();
         $statusText = $service->is_active ? 'diaktifkan' : 'dinonaktifkan';
 
         return redirect()->route('services.index')
             ->with('success', "Layanan {$service->nama_layanan} berhasil {$statusText}.");
+    }
+
+    protected function clearServiceCache(): void
+    {
+        Cache::forget('active_services');
     }
 }

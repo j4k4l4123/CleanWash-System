@@ -41,6 +41,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; }
+        #mainContent {
+            transition: margin-top 0.3s ease-out;
+        }
         @media print {
             .no-print { display: none !important; }
         }
@@ -49,8 +52,11 @@
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
 
+    <!-- Top Hover Trigger Area -->
+    <div id="navbarTriggerZone" class="fixed top-0 left-0 right-0 h-3 z-40 no-print" aria-hidden="true"></div>
+
     <!-- Top Navigation Bar -->
-    <header class="bg-white border-b border-slate-200 sticky top-0 z-30 no-print">
+    <header id="mainHeader" class="bg-white/95 backdrop-blur-sm border-b border-slate-200 fixed top-0 left-0 right-0 z-40 transition-all duration-300 ease-out transform -translate-y-full opacity-0 pointer-events-none shadow-md no-print">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <!-- Brand & Logo -->
@@ -68,9 +74,6 @@
                 <!-- Desktop Nav Links -->
                 @auth
                     <nav class="hidden md:flex items-center gap-1">
-                        <a href="{{ route('dashboard') }}" class="px-3 py-2 rounded-lg text-sm font-medium transition {{ request()->routeIs('dashboard') ? 'text-brand-700 bg-brand-50' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100' }}">
-                            Dashboard
-                        </a>
                         <a href="{{ route('orders.index') }}" class="px-3 py-2 rounded-lg text-sm font-medium transition {{ request()->routeIs('orders.*') ? 'text-brand-700 bg-brand-50' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100' }}">
                             Order Cucian
                         </a>
@@ -79,9 +82,6 @@
                         </a>
                         <a href="{{ route('services.index') }}" class="px-3 py-2 rounded-lg text-sm font-medium transition {{ request()->routeIs('services.*') ? 'text-brand-700 bg-brand-50' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100' }}">
                             Layanan
-                        </a>
-                        <a href="{{ route('payments.index') }}" class="px-3 py-2 rounded-lg text-sm font-medium transition {{ request()->routeIs('payments.*') ? 'text-brand-700 bg-brand-50' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100' }}">
-                            Pembayaran
                         </a>
                         @if(Auth::user()->isAdmin())
                             <a href="{{ route('users.index') }}" class="px-3 py-2 rounded-lg text-sm font-medium transition {{ request()->routeIs('users.*') ? 'text-brand-700 bg-brand-50' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100' }}">
@@ -93,25 +93,9 @@
 
                 <!-- Right Actions -->
                 <div class="flex items-center gap-2 sm:gap-3">
-                    @if(!request()->routeIs('dashboard'))
-                        <a href="{{ route('tracking.index') }}" target="_blank" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition" title="Buka Cek Resi untuk Pelanggan">
-                            <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                            </svg>
-                            <span>Cek Resi</span>
-                        </a>
-                    @endif
-
                     @auth
-                        <a href="{{ route('orders.create') }}" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs sm:text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 rounded-lg transition shadow-xs">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                            </svg>
-                            <span>Order Baru</span>
-                        </a>
-
                         <!-- User Profile & Logout -->
-                        <div class="hidden lg:flex items-center gap-2.5 pl-2.5 border-l border-slate-200 text-xs">
+                        <div class="hidden lg:flex items-center gap-2.5 text-xs">
                             <div class="text-right">
                                 <div class="font-bold text-slate-800 leading-tight">{{ Auth::user()->name }}</div>
                                 <div class="text-[10px] text-slate-500 leading-none flex items-center justify-end gap-1 mt-0.5">
@@ -135,7 +119,7 @@
                     @endauth
 
                     <!-- Mobile menu button -->
-                    <button type="button" onclick="document.getElementById('mobileMenu').classList.toggle('hidden')" class="md:hidden p-2 rounded-lg text-slate-600 hover:bg-slate-100 focus:outline-none">
+                    <button type="button" onclick="toggleMobileMenu()" class="md:hidden p-2 rounded-lg text-slate-600 hover:bg-slate-100 focus:outline-none">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                         </svg>
@@ -159,26 +143,21 @@
                             <button type="submit" class="text-xs font-semibold text-rose-600 hover:underline">Keluar</button>
                         </form>
                     </div>
-                    <a href="{{ route('dashboard') }}" class="block px-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('dashboard') ? 'text-brand-700 bg-brand-50' : 'text-slate-600' }}">Dashboard</a>
                     <a href="{{ route('orders.index') }}" class="block px-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('orders.*') ? 'text-brand-700 bg-brand-50' : 'text-slate-600' }}">Order Cucian</a>
                     <a href="{{ route('customers.index') }}" class="block px-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('customers.*') ? 'text-brand-700 bg-brand-50' : 'text-slate-600' }}">Pelanggan</a>
                     <a href="{{ route('services.index') }}" class="block px-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('services.*') ? 'text-brand-700 bg-brand-50' : 'text-slate-600' }}">Layanan</a>
-                    <a href="{{ route('payments.index') }}" class="block px-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('payments.*') ? 'text-brand-700 bg-brand-50' : 'text-slate-600' }}">Pembayaran</a>
                     @if(Auth::user()->isAdmin())
                         <a href="{{ route('users.index') }}" class="block px-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('users.*') ? 'text-brand-700 bg-brand-50' : 'text-slate-600' }}">Kelola Petugas</a>
                     @endif
                 @else
                     <a href="{{ route('login') }}" class="block px-3 py-2 rounded-lg text-sm font-medium text-brand-600">Masuk Petugas</a>
                 @endauth
-                @if(!request()->routeIs('dashboard'))
-                    <a href="{{ route('tracking.index') }}" class="block px-3 py-2 rounded-lg text-sm font-medium text-slate-600">Lacak Resi Cucian</a>
-                @endif
             </div>
         </div>
     </header>
 
     <!-- Main Content Area -->
-    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <main id="mainContent" class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8 pb-10">
         <!-- Flash Messages -->
         @if (session('success'))
             <div class="mb-6 p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 flex items-start justify-between shadow-xs">
@@ -234,6 +213,110 @@
             </div>
         </div>
     </footer>
+
+    <!-- Auto-hide Navbar Script on Cursor Movement -->
+    <script>
+        (function () {
+            const header = document.getElementById('mainHeader');
+            const main = document.getElementById('mainContent');
+            const triggerZone = document.getElementById('navbarTriggerZone');
+            const mobileMenu = document.getElementById('mobileMenu');
+            if (!header) return;
+
+            let isHovering = false;
+            let hideTimer = null;
+
+            function getNavbarHeight() {
+                return header.offsetHeight || 64;
+            }
+
+            function showNavbar() {
+                clearTimeout(hideTimer);
+                header.classList.remove('-translate-y-full', 'opacity-0', 'pointer-events-none');
+                header.classList.add('translate-y-0', 'opacity-100', 'pointer-events-auto');
+                if (main) {
+                    main.style.marginTop = getNavbarHeight() + 'px';
+                }
+            }
+
+            function hideNavbar(immediate = false) {
+                clearTimeout(hideTimer);
+
+                // Tetap tampilkan jika menu mobile sedang terbuka
+                if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
+                    return;
+                }
+
+                if (immediate) {
+                    header.classList.remove('translate-y-0', 'opacity-100', 'pointer-events-auto');
+                    header.classList.add('-translate-y-full', 'opacity-0', 'pointer-events-none');
+                    if (main) {
+                        main.style.marginTop = '0px';
+                    }
+                    return;
+                }
+
+                hideTimer = setTimeout(function () {
+                    if (!isHovering) {
+                        header.classList.remove('translate-y-0', 'opacity-100', 'pointer-events-auto');
+                        header.classList.add('-translate-y-full', 'opacity-0', 'pointer-events-none');
+                        if (main) {
+                            main.style.marginTop = '0px';
+                        }
+                    }
+                }, 200);
+            }
+
+            // Global mobile menu toggle function
+            window.toggleMobileMenu = function () {
+                if (!mobileMenu) return;
+                mobileMenu.classList.toggle('hidden');
+                if (!mobileMenu.classList.contains('hidden')) {
+                    showNavbar();
+                    requestAnimationFrame(function () {
+                        if (main) main.style.marginTop = getNavbarHeight() + 'px';
+                    });
+                } else {
+                    if (main) main.style.marginTop = (header.classList.contains('translate-y-0') ? 64 : 0) + 'px';
+                }
+            };
+
+            // Saat kursor masuk ke area navbar
+            header.addEventListener('mouseenter', function () {
+                isHovering = true;
+                showNavbar();
+            });
+
+            // Saat kursor keluar dari area navbar
+            header.addEventListener('mouseleave', function (e) {
+                isHovering = false;
+                if (e.clientY > getNavbarHeight()) {
+                    hideNavbar();
+                }
+            });
+
+            // Area trigger tipis di batas atas layar
+            if (triggerZone) {
+                triggerZone.addEventListener('mouseenter', function () {
+                    showNavbar();
+                });
+                triggerZone.addEventListener('touchstart', function () {
+                    showNavbar();
+                }, { passive: true });
+            }
+
+            // Deteksi pergerakan kursor global
+            document.addEventListener('mousemove', function (e) {
+                // Muncul jika kursor berada di area atas layar (misal 50px dari atas)
+                if (e.clientY <= 50) {
+                    showNavbar();
+                } else if (!isHovering && e.clientY > ((header.classList.contains('translate-y-0') ? getNavbarHeight() : 0) + 15)) {
+                    // Sembunyi jika kursor berada di tengah atau bawah layar
+                    hideNavbar();
+                }
+            });
+        })();
+    </script>
 
     @stack('scripts')
 </body>

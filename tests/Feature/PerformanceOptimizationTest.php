@@ -115,4 +115,33 @@ class PerformanceOptimizationTest extends TestCase
 
         $this->assertTrue(Cache::has('active_services'));
     }
+
+    public function test_customers_index_renders_properly_with_paginator(): void
+    {
+        $user = User::factory()->create();
+        for ($i = 1; $i <= 15; $i++) {
+            Customer::create([
+                'kode_pelanggan' => sprintf('CUST-%04d', $i),
+                'nama' => "Customer {$i}",
+                'no_hp' => '0812345678'.$i,
+                'alamat' => 'Jl. Test No. '.$i,
+            ]);
+        }
+
+        $response = $this->actingAs($user)->get(route('customers.index'));
+
+        $response->assertStatus(200);
+        $response->assertViewHas('customers');
+        $response->assertSee('Customer 1');
+        $response->assertSee('CUST-0001');
+    }
+
+    public function test_dashboard_renders_properly(): void
+    {
+        $user = User::factory()->create();
+        $response = $this->actingAs($user)->get(route('dashboard'));
+
+        $response->assertStatus(200);
+        $response->assertViewHas('recentOrders');
+    }
 }

@@ -17,7 +17,7 @@ class OrderController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Order::with(['customer', 'service', 'payment']);
+        $query = Order::with(['customer', 'service']);
 
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
@@ -46,6 +46,7 @@ class OrderController extends Controller
         }
 
         $orders = $query->latest('tgl_masuk')->paginate(10)->withQueryString();
+
         $statuses = Order::listStatuses();
 
         return view('orders.index', compact('orders', 'statuses'));
@@ -53,10 +54,32 @@ class OrderController extends Controller
 
     public function create()
     {
-        $customers = Customer::select(['id', 'nama', 'kode_pelanggan', 'no_hp'])->orderBy('nama')->get();
+        $customers = $this->getActiveCustomers();
         $services = $this->getActiveServices();
 
         return view('orders.create', compact('customers', 'services'));
+    }
+
+    protected function getActiveCustomers()
+    {
+        $cached = Cache::remember('active_customers_list', 300, function () {
+            return Customer::select(['id', 'nama', 'kode_pelanggan', 'no_hp'])
+                ->orderBy('nama')
+                ->get()
+                ->toArray();
+        });
+
+        if ($cached instanceof Collection) {
+            return $cached;
+        }
+
+        if (is_array($cached)) {
+            return Customer::hydrate($cached);
+        }
+
+        Cache::forget('active_customers_list');
+
+        return Customer::select(['id', 'nama', 'kode_pelanggan', 'no_hp'])->orderBy('nama')->get();
     }
 
     protected function getActiveServices()
@@ -84,8 +107,20 @@ class OrderController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'customer_id' => 'required|exists:customers,id',
-            'service_id' => 'required|exists:services,id',
+            'customer_id' => ['required', function ($attribute, $value, $fail) {
+                if (! $this->getActiveCustomers()->contains('id', (int) $value)) {
+                    if (! Customer::where('id', $value)->exists()) {
+                        $fail('Pelanggan yang dipilih tidak valid.');
+                    }
+                }
+            }],
+            'service_id' => ['required', function ($attribute, $value, $fail) {
+                if (! $this->getActiveServices()->contains('id', (int) $value)) {
+                    if (! Service::where('id', $value)->exists()) {
+                        $fail('Layanan yang dipilih tidak valid.');
+                    }
+                }
+            }],
             'berat_atau_jumlah' => 'required|numeric|min:0.1',
             'catatan' => 'nullable|string',
             'bayar_sekarang' => 'nullable|boolean',
@@ -93,13 +128,15 @@ class OrderController extends Controller
             'uang_diterima' => 'nullable|numeric|min:0',
         ]);
 
-        $service = Service::findOrFail($validated['service_id']);
+        $service = $this->getActiveServices()->firstWhere('id', (int) $validated['service_id'])
+            ?? Service::findOrFail($validated['service_id']);
         $hargaPerSatuan = $service->harga;
         $totalHarga = round($validated['berat_atau_jumlah'] * $hargaPerSatuan, 2);
 
         // Generate Order Code ORD-YYYYMMDD-XXX
         $dateCode = Carbon::now()->format('Ymd');
-        $todayOrdersCount = Order::whereDate('tgl_masuk', Carbon::today())->count();
+        $todayStart = Carbon::today()->startOfDay();
+        $todayOrdersCount = Order::where('tgl_masuk', '>=', $todayStart)->count();
         $kodeOrder = 'ORD-'.$dateCode.'-'.str_pad($todayOrdersCount + 1, 3, '0', STR_PAD_LEFT);
 
         $now = Carbon::now();
@@ -139,7 +176,7 @@ class OrderController extends Controller
                 $uangDiterima = $validated['uang_diterima'] ? (float) $validated['uang_diterima'] : $totalHarga;
                 $kembalian = max(0, $uangDiterima - $totalHarga);
 
-                $paymentCount = Payment::whereDate('tgl_bayar', Carbon::today())->count();
+                $paymentCount = Payment::where('tgl_bayar', '>=', $todayStart)->count();
                 $kodePembayaran = 'INV-'.$dateCode.'-'.str_pad($paymentCount + 1, 3, '0', STR_PAD_LEFT);
 
                 Payment::create([
@@ -156,6 +193,7 @@ class OrderController extends Controller
             }
 
             DB::commit();
+            $this->clearOrderCache();
 
             return redirect()->route('orders.show', $order)
                 ->with('success', "Order {$order->kode_order} berhasil dibuat!");
@@ -168,7 +206,7 @@ class OrderController extends Controller
 
     public function show(Order $order)
     {
-        $order->load(['customer', 'service', 'statusLogs', 'payments']);
+        $order->loadMissing(['customer', 'service', 'statusLogs', 'payments']);
         $statuses = Order::listStatuses();
 
         return view('orders.show', compact('order', 'statuses'));
@@ -176,7 +214,7 @@ class OrderController extends Controller
 
     public function edit(Order $order)
     {
-        $customers = Customer::select(['id', 'nama', 'kode_pelanggan', 'no_hp'])->orderBy('nama')->get();
+        $customers = $this->getActiveCustomers();
         $services = $this->getActiveServices();
 
         return view('orders.edit', compact('order', 'customers', 'services'));
@@ -185,13 +223,26 @@ class OrderController extends Controller
     public function update(Request $request, Order $order)
     {
         $validated = $request->validate([
-            'customer_id' => 'required|exists:customers,id',
-            'service_id' => 'required|exists:services,id',
+            'customer_id' => ['required', function ($attribute, $value, $fail) {
+                if (! $this->getActiveCustomers()->contains('id', (int) $value)) {
+                    if (! Customer::where('id', $value)->exists()) {
+                        $fail('Pelanggan yang dipilih tidak valid.');
+                    }
+                }
+            }],
+            'service_id' => ['required', function ($attribute, $value, $fail) {
+                if (! $this->getActiveServices()->contains('id', (int) $value)) {
+                    if (! Service::where('id', $value)->exists()) {
+                        $fail('Layanan yang dipilih tidak valid.');
+                    }
+                }
+            }],
             'berat_atau_jumlah' => 'required|numeric|min:0.1',
             'catatan' => 'nullable|string',
         ]);
 
-        $service = Service::findOrFail($validated['service_id']);
+        $service = $this->getActiveServices()->firstWhere('id', (int) $validated['service_id'])
+            ?? Service::findOrFail($validated['service_id']);
         $hargaPerSatuan = $service->harga;
         $totalHarga = round($validated['berat_atau_jumlah'] * $hargaPerSatuan, 2);
 
@@ -204,6 +255,8 @@ class OrderController extends Controller
             'catatan' => $validated['catatan'],
         ]);
 
+        $this->clearOrderCache();
+
         return redirect()->route('orders.show', $order)
             ->with('success', "Data order {$order->kode_order} berhasil diperbarui!");
     }
@@ -212,6 +265,7 @@ class OrderController extends Controller
     {
         $code = $order->kode_order;
         $order->delete();
+        $this->clearOrderCache();
 
         return redirect()->route('orders.index')
             ->with('success', "Order {$code} berhasil dihapus.");
@@ -249,6 +303,13 @@ class OrderController extends Controller
             'diupdate_oleh' => auth()->user()->name ?? 'Kasir / Admin',
         ]);
 
+        $this->clearOrderCache();
+
+        if ($request->input('redirect_to') === 'index') {
+            return redirect()->to($request->header('referer', route('orders.index')))
+                ->with('success', "Status cucian {$order->kode_order} berhasil diperbarui menjadi {$order->status_label}!");
+        }
+
         return redirect()->route('orders.show', $order)
             ->with('success', "Status cucian berhasil diperbarui menjadi {$order->status_label}!");
     }
@@ -258,5 +319,10 @@ class OrderController extends Controller
         $order->load(['customer', 'service', 'payment']);
 
         return view('orders.print', compact('order'));
+    }
+
+    protected function clearOrderCache(): void
+    {
+        Cache::forget('dashboard_stats');
     }
 }
