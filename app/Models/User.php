@@ -47,12 +47,21 @@ class User extends Authenticatable
     }
 
     /**
+     * Check if the user is a worker (pekerja).
+     */
+    public function isPekerja(): bool
+    {
+        return $this->role === 'pekerja';
+    }
+
+    /**
      * Get user-friendly role label.
      */
     public function getRoleLabelAttribute(): string
     {
         return match ($this->role) {
             'admin' => 'Admin / Owner',
+            'pekerja' => 'Pekerja Laundry',
             default => 'Kasir / Petugas',
         };
     }
@@ -64,6 +73,7 @@ class User extends Authenticatable
     {
         return match ($this->role) {
             'admin' => 'bg-purple-50 text-purple-700 border-purple-200',
+            'pekerja' => 'bg-amber-50 text-amber-700 border-amber-200',
             default => 'bg-blue-50 text-blue-700 border-blue-200',
         };
     }

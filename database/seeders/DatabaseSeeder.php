@@ -37,6 +37,17 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
+        // Pekerja Laundry
+        User::updateOrCreate(
+            ['email' => 'pekerja@laundry.test'],
+            [
+                'name' => 'Pekerja Laundry',
+                'password' => bcrypt('password'),
+                'role' => 'pekerja',
+                'no_hp' => '081234567899',
+            ]
+        );
+
         $this->call([
             CustomerSeeder::class,
             ServiceSeeder::class,

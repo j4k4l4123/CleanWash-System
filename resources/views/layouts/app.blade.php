@@ -61,7 +61,7 @@
             <div class="flex items-center justify-between h-16">
                 <!-- Brand & Logo -->
                 <div class="flex items-center gap-3">
-                    <a href="{{ route('dashboard') }}" class="flex items-center gap-2.5">
+                    <a href="{{ Auth::check() && Auth::user()->isPekerja() ? route('orders.index') : route('dashboard') }}" class="flex items-center gap-2.5">
                         <div class="w-10 h-10 rounded-xl bg-brand-600 flex items-center justify-center text-white font-bold shadow-xs">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
@@ -77,12 +77,14 @@
                         <a href="{{ route('orders.index') }}" class="px-3 py-2 rounded-lg text-sm font-medium transition {{ request()->routeIs('orders.*') ? 'text-brand-700 bg-brand-50' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100' }}">
                             Order Cucian
                         </a>
-                        <a href="{{ route('customers.index') }}" class="px-3 py-2 rounded-lg text-sm font-medium transition {{ request()->routeIs('customers.*') ? 'text-brand-700 bg-brand-50' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100' }}">
-                            Pelanggan
-                        </a>
-                        <a href="{{ route('services.index') }}" class="px-3 py-2 rounded-lg text-sm font-medium transition {{ request()->routeIs('services.*') ? 'text-brand-700 bg-brand-50' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100' }}">
-                            Layanan
-                        </a>
+                        @if(!Auth::user()->isPekerja())
+                            <a href="{{ route('customers.index') }}" class="px-3 py-2 rounded-lg text-sm font-medium transition {{ request()->routeIs('customers.*') ? 'text-brand-700 bg-brand-50' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100' }}">
+                                Pelanggan
+                            </a>
+                            <a href="{{ route('services.index') }}" class="px-3 py-2 rounded-lg text-sm font-medium transition {{ request()->routeIs('services.*') ? 'text-brand-700 bg-brand-50' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100' }}">
+                                Layanan
+                            </a>
+                        @endif
                         @if(Auth::user()->isAdmin())
                             <a href="{{ route('users.index') }}" class="px-3 py-2 rounded-lg text-sm font-medium transition {{ request()->routeIs('users.*') ? 'text-brand-700 bg-brand-50' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100' }}">
                                 Petugas
@@ -144,8 +146,10 @@
                         </form>
                     </div>
                     <a href="{{ route('orders.index') }}" class="block px-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('orders.*') ? 'text-brand-700 bg-brand-50' : 'text-slate-600' }}">Order Cucian</a>
-                    <a href="{{ route('customers.index') }}" class="block px-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('customers.*') ? 'text-brand-700 bg-brand-50' : 'text-slate-600' }}">Pelanggan</a>
-                    <a href="{{ route('services.index') }}" class="block px-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('services.*') ? 'text-brand-700 bg-brand-50' : 'text-slate-600' }}">Layanan</a>
+                    @if(!Auth::user()->isPekerja())
+                        <a href="{{ route('customers.index') }}" class="block px-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('customers.*') ? 'text-brand-700 bg-brand-50' : 'text-slate-600' }}">Pelanggan</a>
+                        <a href="{{ route('services.index') }}" class="block px-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('services.*') ? 'text-brand-700 bg-brand-50' : 'text-slate-600' }}">Layanan</a>
+                    @endif
                     @if(Auth::user()->isAdmin())
                         <a href="{{ route('users.index') }}" class="block px-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('users.*') ? 'text-brand-700 bg-brand-50' : 'text-slate-600' }}">Kelola Petugas</a>
                     @endif

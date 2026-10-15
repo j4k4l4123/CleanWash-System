@@ -11,19 +11,21 @@
             <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Order & Transaksi Cucian</h1>
             <p class="text-sm text-slate-500">Kelola dan pantau seluruh transaksi penerimaan cucian.</p>
         </div>
-        <div>
-            <a href="{{ route('orders.create') }}" class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-brand-600 rounded-xl hover:bg-brand-700 transition shadow-xs">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                </svg>
-                <span>Terima Order Baru</span>
-            </a>
-        </div>
+        @if(!Auth::user()->isPekerja())
+            <div>
+                <a href="{{ route('orders.create') }}" class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-brand-600 rounded-xl hover:bg-brand-700 transition shadow-xs">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    <span>Terima Order Baru</span>
+                </a>
+            </div>
+        @endif
     </div>
 
     <!-- Filter Bar -->
     <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs">
-        <form method="GET" action="{{ route('orders.index') }}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+        <form method="GET" action="{{ route('orders.index') }}" class="grid grid-cols-1 sm:grid-cols-2 {{ Auth::user()->isPekerja() ? 'lg:grid-cols-4' : 'lg:grid-cols-5' }} gap-3">
             <!-- Search -->
             <div class="relative lg:col-span-2">
                 <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -32,24 +34,28 @@
                 <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari kode order, nama pelanggan, no hp..." class="w-full pl-10 pr-4 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500 focus:bg-white transition">
             </div>
 
-            <!-- Status Cucian -->
-            <div>
-                <select name="status_cucian" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500 focus:bg-white transition">
-                    <option value="">Semua Status Cucian</option>
-                    @foreach ($statuses as $val => $lbl)
-                        <option value="{{ $val }}" {{ request('status_cucian') === $val ? 'selected' : '' }}>{{ $lbl }}</option>
-                    @endforeach
-                </select>
-            </div>
+            @if(!Auth::user()->isPekerja())
+                <!-- Status Cucian -->
+                <div>
+                    <select name="status_cucian" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500 focus:bg-white transition">
+                        <option value="">Semua Status Cucian</option>
+                        @foreach ($statuses as $val => $lbl)
+                            <option value="{{ $val }}" {{ request('status_cucian') === $val ? 'selected' : '' }}>{{ $lbl }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            @endif
 
-            <!-- Status Pembayaran -->
-            <div>
-                <select name="status_pembayaran" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500 focus:bg-white transition">
-                    <option value="">Semua Pembayaran</option>
-                    <option value="belum_lunas" {{ request('status_pembayaran') === 'belum_lunas' ? 'selected' : '' }}>Belum Lunas</option>
-                    <option value="lunas" {{ request('status_pembayaran') === 'lunas' ? 'selected' : '' }}>Lunas</option>
-                </select>
-            </div>
+            @if(!Auth::user()->isPekerja())
+                <!-- Status Pembayaran -->
+                <div>
+                    <select name="status_pembayaran" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500 focus:bg-white transition">
+                        <option value="">Semua Pembayaran</option>
+                        <option value="belum_lunas" {{ request('status_pembayaran') === 'belum_lunas' ? 'selected' : '' }}>Belum Lunas</option>
+                        <option value="lunas" {{ request('status_pembayaran') === 'lunas' ? 'selected' : '' }}>Lunas</option>
+                    </select>
+                </div>
+            @endif
 
             <!-- Filter Buttons -->
             <div class="flex items-center gap-2">
@@ -78,7 +84,10 @@
                         <th class="px-5 py-3.5">Berat / Qty</th>
                         <th class="px-5 py-3.5">Total Biaya</th>
                         <th class="px-5 py-3.5">Status Cucian</th>
-                        <th class="px-5 py-3.5">Pembayaran</th>
+                        <th class="px-5 py-3.5">Catatan</th>
+                        @if(!Auth::user()->isPekerja())
+                            <th class="px-5 py-3.5">Pembayaran</th>
+                        @endif
                         <th class="px-5 py-3.5 text-right">Aksi</th>
                     </tr>
                 </thead>
@@ -108,21 +117,38 @@
                                 Rp {{ number_format($order->total_harga, 0, ',', '.') }}
                             </td>
                             <td class="px-5 py-4">
-                                <button type="button"
-                                        onclick="openStatusDropdown(event, this, {{ $order->id }}, '{{ $order->kode_order }}', '{{ addslashes($order->customer->nama) }}', '{{ $order->status_cucian }}')"
-                                        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border {{ $order->status_badge_class }} hover:shadow-xs hover:ring-2 hover:ring-slate-300/60 transition cursor-pointer group"
-                                        title="Klik untuk mengubah status cucian">
-                                    <span>{{ $order->status_label }}</span>
-                                    <svg class="w-3 h-3 opacity-60 group-hover:opacity-100 transition-transform group-hover:translate-y-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                    </svg>
-                                </button>
+                                @if(Auth::user()->isPekerja())
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border {{ $order->status_badge_class }}">
+                                        {{ $order->status_label }}
+                                    </span>
+                                @else
+                                    <button type="button"
+                                            onclick="openStatusDropdown(event, this, {{ $order->id }}, '{{ $order->kode_order }}', '{{ addslashes($order->customer->nama) }}', '{{ $order->status_cucian }}')"
+                                            class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border {{ $order->status_badge_class }} hover:shadow-xs hover:ring-2 hover:ring-slate-300/60 transition cursor-pointer group"
+                                            title="Klik untuk mengubah status cucian">
+                                        <span>{{ $order->status_label }}</span>
+                                        <svg class="w-3 h-3 opacity-60 group-hover:opacity-100 transition-transform group-hover:translate-y-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                    </button>
+                                @endif
                             </td>
-                            <td class="px-5 py-4">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border {{ $order->payment_badge_class }}">
-                                    {{ $order->status_pembayaran === 'lunas' ? 'Lunas' : 'Belum Lunas' }}
-                                </span>
+                            <td class="px-5 py-4 text-xs">
+                                @if($order->catatan)
+                                    <div class="inline-block max-w-xs px-2.5 py-1 rounded-lg bg-amber-50 text-amber-900 border border-amber-200 text-xs font-medium break-words leading-relaxed">
+                                        {{ $order->catatan }}
+                                    </div>
+                                @else
+                                    <span class="text-slate-400 italic text-xs">-</span>
+                                @endif
                             </td>
+                            @if(!Auth::user()->isPekerja())
+                                <td class="px-5 py-4">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border {{ $order->payment_badge_class }}">
+                                        {{ $order->status_pembayaran === 'lunas' ? 'Lunas' : 'Belum Lunas' }}
+                                    </span>
+                                </td>
+                            @endif
                             <td class="px-5 py-4 text-right">
                                 <div class="flex items-center justify-end gap-1.5">
                                     <a href="{{ route('orders.show', $order) }}" class="px-2.5 py-1 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition">
@@ -133,7 +159,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="9" class="px-5 py-8 text-center text-slate-400">
+                            <td colspan="{{ Auth::user()->isPekerja() ? 9 : 10 }}" class="px-5 py-8 text-center text-slate-400">
                                 Tidak ada data order cucian yang sesuai dengan filter.
                             </td>
                         </tr>
@@ -151,6 +177,7 @@
 
 </div>
 
+@if(!Auth::user()->isPekerja())
 <!-- Global Floating Status Dropdown Menu -->
 <div id="statusDropdownMenu" class="hidden fixed z-50 bg-white rounded-2xl shadow-xl border border-slate-200/90 py-1.5 w-48 text-xs transition-all duration-150">
     <div class="px-3.5 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100">
@@ -256,6 +283,7 @@
         </form>
     </div>
 </div>
+@endif
 @endsection
 
 @push('scripts')

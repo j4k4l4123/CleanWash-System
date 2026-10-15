@@ -15,9 +15,11 @@
                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border {{ $order->status_badge_class }}">
                     {{ $order->status_label }}
                 </span>
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border {{ $order->payment_badge_class }}">
-                    {{ $order->status_pembayaran === 'lunas' ? 'LUNAS' : 'BELUM LUNAS' }}
-                </span>
+                @if(!Auth::user()->isPekerja())
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border {{ $order->payment_badge_class }}">
+                        {{ $order->status_pembayaran === 'lunas' ? 'LUNAS' : 'BELUM LUNAS' }}
+                    </span>
+                @endif
             </div>
             <p class="text-xs text-slate-500 mt-1.5">
                 Order masuk pada {{ $order->tgl_masuk->isoFormat('dddd, D MMMM Y - HH:mm') }} WIB
@@ -30,7 +32,7 @@
                 $cleanPhone = str_starts_with($rawPhone, '0') ? '62' . substr($rawPhone, 1) : $rawPhone;
                 $waText = "Halo Kak {$order->customer->nama},\n\nUpdate pesanan cucian Anda di CleanWash Laundry:\nNo. Order: {$order->kode_order}\nStatus: {$order->status_label}\nTotal Tagihan: Rp " . number_format($order->total_harga, 0, ',', '.') . " (" . ($order->status_pembayaran === 'lunas' ? 'LUNAS' : 'BELUM LUNAS') . ")\n\nCek progres cucian online di:\n" . url('/tracking/' . $order->kode_order) . "\n\nTerima kasih!";
             @endphp
-            @if($cleanPhone)
+            @if($cleanPhone && !Auth::user()->isPekerja())
                 <a href="https://wa.me/{{ $cleanPhone }}?text={{ rawurlencode($waText) }}" target="_blank" class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-300 rounded-xl hover:bg-emerald-100 transition shadow-xs" title="Kirim Notifikasi Status via WhatsApp">
                     <svg class="w-4 h-4 text-emerald-600" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.669-.699c.969.54 1.772.84 2.79.84h.001c3.181 0 5.768-2.586 5.768-5.766 0-3.18-2.587-5.766-5.768-5.766zm9.969 5.828c0 5.519-4.481 10-10 10-1.748 0-3.385-.45-4.817-1.238l-7.183 1.88 1.914-6.994c-.878-1.492-1.384-3.232-1.384-5.088 0-5.519 4.481-10 10-10s10 4.481 10 10z"/>
@@ -38,12 +40,14 @@
                     <span>Kirim WA</span>
                 </a>
             @endif
-            <button type="button" onclick="openStatusModal()" class="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-brand-600 rounded-xl hover:bg-brand-700 transition shadow-xs">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                </svg>
-                <span>Update Status Cucian</span>
-            </button>
+            @if(!Auth::user()->isPekerja())
+                <button type="button" onclick="openStatusModal()" class="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-brand-600 rounded-xl hover:bg-brand-700 transition shadow-xs">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                    </svg>
+                    <span>Update Status Cucian</span>
+                </button>
+            @endif
             <a href="{{ route('orders.index') }}" class="px-3 py-2 text-xs font-medium text-slate-500 hover:text-slate-800 transition">
                 Kembali
             </a>
@@ -198,22 +202,28 @@
             <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs space-y-3">
                 <div class="flex items-center justify-between">
                     <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-400">Data Pelanggan</h3>
-                    <a href="{{ route('customers.show', $order->customer) }}" class="text-xs font-semibold text-brand-600 hover:underline">
-                        Lihat Profil
-                    </a>
+                    @if(!Auth::user()->isPekerja())
+                        <a href="{{ route('customers.show', $order->customer) }}" class="text-xs font-semibold text-brand-600 hover:underline">
+                            Lihat Profil
+                        </a>
+                    @endif
                 </div>
 
                 <div class="space-y-1.5 text-sm">
                     <div class="font-bold text-slate-900">{{ $order->customer->nama }}</div>
                     <div class="font-mono text-xs text-brand-700 font-medium">{{ $order->customer->kode_pelanggan }}</div>
                     <div class="text-xs text-slate-600 flex items-center justify-between gap-1">
-                        <a href="https://wa.me/{{ $cleanPhone }}?text={{ rawurlencode($waText) }}" target="_blank" class="flex items-center gap-1 text-slate-700 hover:text-emerald-700 font-medium hover:underline" title="Chat WhatsApp Pelanggan">
-                            <svg class="w-3.5 h-3.5 text-emerald-500" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.669-.699c.969.54 1.772.84 2.79.84h.001c3.181 0 5.768-2.586 5.768-5.766 0-3.18-2.587-5.766-5.768-5.766zm9.969 5.828c0 5.519-4.481 10-10 10-1.748 0-3.385-.45-4.817-1.238l-7.183 1.88 1.914-6.994c-.878-1.492-1.384-3.232-1.384-5.088 0-5.519 4.481-10 10-10s10 4.481 10 10z"/>
-                            </svg>
-                            <span>{{ $order->customer->no_hp }}</span>
-                        </a>
-                        <span class="text-[10px] text-emerald-600 font-semibold bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">WA Aktif</span>
+                        @if(!Auth::user()->isPekerja())
+                            <a href="https://wa.me/{{ $cleanPhone }}?text={{ rawurlencode($waText) }}" target="_blank" class="flex items-center gap-1 text-slate-700 hover:text-emerald-700 font-medium hover:underline" title="Chat WhatsApp Pelanggan">
+                                <svg class="w-3.5 h-3.5 text-emerald-500" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.669-.699c.969.54 1.772.84 2.79.84h.001c3.181 0 5.768-2.586 5.768-5.766 0-3.18-2.587-5.766-5.768-5.766zm9.969 5.828c0 5.519-4.481 10-10 10-1.748 0-3.385-.45-4.817-1.238l-7.183 1.88 1.914-6.994c-.878-1.492-1.384-3.232-1.384-5.088 0-5.519 4.481-10 10-10s10 4.481 10 10z"/>
+                                </svg>
+                                <span>{{ $order->customer->no_hp }}</span>
+                            </a>
+                            <span class="text-[10px] text-emerald-600 font-semibold bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">WA Aktif</span>
+                        @else
+                            <span class="font-mono text-slate-600">{{ $order->customer->no_hp }}</span>
+                        @endif
                     </div>
                     @if($order->customer->alamat)
                         <div class="text-xs text-slate-500 pt-1 border-t border-slate-100">{{ $order->customer->alamat }}</div>
@@ -221,93 +231,97 @@
                 </div>
             </div>
 
-            <!-- Payment Status & Settlement Box -->
-            <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs space-y-4">
-                <div class="flex items-center justify-between">
-                    <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-400">Status Pembayaran</h3>
-                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border {{ $order->payment_badge_class }}">
-                        {{ $order->status_pembayaran === 'lunas' ? 'LUNAS' : 'BELUM LUNAS' }}
-                    </span>
-                </div>
-
-                @if($order->status_pembayaran === 'lunas')
-                    @php $pay = $order->payment; @endphp
-                    <div class="p-4 rounded-xl bg-emerald-50 border border-emerald-200 space-y-2 text-xs text-emerald-900">
-                        <div class="flex items-center justify-between font-mono">
-                            <span>No Invoice:</span>
-                            <span class="font-bold">{{ $pay ? $pay->kode_pembayaran : '-' }}</span>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <span>Metode:</span>
-                            <span class="font-semibold uppercase">{{ $order->metode_pembayaran ?? ($pay ? $pay->metode_pembayaran : '-') }}</span>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <span>Jumlah Bayar:</span>
-                            <span class="font-bold font-mono">Rp {{ number_format($order->total_harga, 0, ',', '.') }}</span>
-                        </div>
-                        @if($pay && $pay->uang_diterima && $pay->metode_pembayaran === 'tunai')
-                            <div class="flex items-center justify-between text-slate-600 border-t border-emerald-200 pt-1">
-                                <span>Uang Diterima:</span>
-                                <span>Rp {{ number_format($pay->uang_diterima, 0, ',', '.') }}</span>
-                            </div>
-                            <div class="flex items-center justify-between text-slate-600">
-                                <span>Kembalian:</span>
-                                <span>Rp {{ number_format($pay->kembalian, 0, ',', '.') }}</span>
-                            </div>
-                        @endif
-                        <div class="pt-2 text-slate-500 text-[11px]">
-                            Dibayar pada: {{ $pay ? $pay->tgl_bayar->isoFormat('D MMM Y, HH:mm') : $order->updated_at->isoFormat('D MMM Y, HH:mm') }} WIB
-                        </div>
+            @if(!Auth::user()->isPekerja())
+                <!-- Payment Status & Settlement Box -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-400">Status Pembayaran</h3>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border {{ $order->payment_badge_class }}">
+                            {{ $order->status_pembayaran === 'lunas' ? 'LUNAS' : 'BELUM LUNAS' }}
+                        </span>
                     </div>
-                @else
-                    <!-- Settle Payment Form -->
-                    <div class="p-4 rounded-xl bg-rose-50/70 border border-rose-200 space-y-3">
-                        <div class="text-xs text-rose-800 font-medium">
-                            Tagihan sebesar <span class="font-bold">Rp {{ number_format($order->total_harga, 0, ',', '.') }}</span> belum dibayar.
-                        </div>
 
-                        <form action="{{ route('payments.store', $order) }}" method="POST" class="space-y-3">
-                            @csrf
-                            <div>
-                                <label class="block text-[11px] font-semibold text-slate-700 uppercase mb-1">Metode Bayar</label>
-                                <select name="metode_pembayaran" id="payMethodSelect" onchange="togglePayInputs()" class="w-full px-3 py-1.5 text-xs bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-brand-500">
-                                    <option value="tunai">Tunai (Cash)</option>
-                                    <option value="qris">QRIS</option>
-                                    <option value="transfer">Transfer Bank</option>
-                                </select>
+                    @if($order->status_pembayaran === 'lunas')
+                        @php $pay = $order->payment; @endphp
+                        <div class="p-4 rounded-xl bg-emerald-50 border border-emerald-200 space-y-2 text-xs text-emerald-900">
+                            <div class="flex items-center justify-between font-mono">
+                                <span>No Invoice:</span>
+                                <span class="font-bold">{{ $pay ? $pay->kode_pembayaran : '-' }}</span>
                             </div>
-
-                            <div id="uangDiterimaRow">
-                                <label class="block text-[11px] font-semibold text-slate-700 uppercase mb-1">Uang Diterima (Rp)</label>
-                                <input type="number" name="uang_diterima" id="settleUangDiterima" value="{{ $order->total_harga }}" min="{{ $order->total_harga }}" step="500" oninput="calcSettleKembalian()" class="w-full px-3 py-1.5 text-xs bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-brand-500">
-                                <div id="settleKembalianText" class="text-[11px] text-emerald-700 font-semibold mt-1">
-                                    Kembalian: Rp 0
+                            <div class="flex items-center justify-between">
+                                <span>Metode:</span>
+                                <span class="font-semibold uppercase">{{ $order->metode_pembayaran ?? ($pay ? $pay->metode_pembayaran : '-') }}</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span>Jumlah Bayar:</span>
+                                <span class="font-bold font-mono">Rp {{ number_format($order->total_harga, 0, ',', '.') }}</span>
+                            </div>
+                            @if($pay && $pay->uang_diterima && $pay->metode_pembayaran === 'tunai')
+                                <div class="flex items-center justify-between text-slate-600 border-t border-emerald-200 pt-1">
+                                    <span>Uang Diterima:</span>
+                                    <span>Rp {{ number_format($pay->uang_diterima, 0, ',', '.') }}</span>
                                 </div>
+                                <div class="flex items-center justify-between text-slate-600">
+                                    <span>Kembalian:</span>
+                                    <span>Rp {{ number_format($pay->kembalian, 0, ',', '.') }}</span>
+                                </div>
+                            @endif
+                            <div class="pt-2 text-slate-500 text-[11px]">
+                                Dibayar pada: {{ $pay ? $pay->tgl_bayar->isoFormat('D MMM Y, HH:mm') : $order->updated_at->isoFormat('D MMM Y, HH:mm') }} WIB
+                            </div>
+                        </div>
+                    @else
+                        <!-- Settle Payment Form -->
+                        <div class="p-4 rounded-xl bg-rose-50/70 border border-rose-200 space-y-3">
+                            <div class="text-xs text-rose-800 font-medium">
+                                Tagihan sebesar <span class="font-bold">Rp {{ number_format($order->total_harga, 0, ',', '.') }}</span> belum dibayar.
                             </div>
 
-                            <button type="submit" class="w-full py-2 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition shadow-xs">
-                                Konfirmasi Pembayaran Lunas
+                            <form action="{{ route('payments.store', $order) }}" method="POST" class="space-y-3">
+                                @csrf
+                                <div>
+                                    <label class="block text-[11px] font-semibold text-slate-700 uppercase mb-1">Metode Bayar</label>
+                                    <select name="metode_pembayaran" id="payMethodSelect" onchange="togglePayInputs()" class="w-full px-3 py-1.5 text-xs bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-brand-500">
+                                        <option value="tunai">Tunai (Cash)</option>
+                                        <option value="qris">QRIS</option>
+                                        <option value="transfer">Transfer Bank</option>
+                                    </select>
+                                </div>
+
+                                <div id="uangDiterimaRow">
+                                    <label class="block text-[11px] font-semibold text-slate-700 uppercase mb-1">Uang Diterima (Rp)</label>
+                                    <input type="number" name="uang_diterima" id="settleUangDiterima" value="{{ $order->total_harga }}" min="{{ $order->total_harga }}" step="500" oninput="calcSettleKembalian()" class="w-full px-3 py-1.5 text-xs bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-brand-500">
+                                    <div id="settleKembalianText" class="text-[11px] text-emerald-700 font-semibold mt-1">
+                                        Kembalian: Rp 0
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="w-full py-2 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition shadow-xs">
+                                    Konfirmasi Pembayaran Lunas
+                                </button>
+                            </form>
+                        </div>
+                    @endif
+                </div>
+            @endif
+
+            @if(!Auth::user()->isPekerja())
+                <!-- Danger Zone: Delete Order -->
+                <div class="pt-2 flex items-center justify-between text-xs text-slate-400">
+                    <a href="{{ route('orders.edit', $order) }}" class="text-slate-600 hover:text-slate-900 underline">
+                        Edit Data Order
+                    </a>
+                    @if(Auth::user()->isAdmin())
+                        <form action="{{ route('orders.destroy', $order) }}" method="POST" onsubmit="return confirm('Hapus pesanan ini? Seluruh riwayat dan status akan dihapus permanen.');">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="text-rose-500 hover:text-rose-700 hover:underline">
+                                Hapus Order
                             </button>
                         </form>
-                    </div>
-                @endif
-            </div>
-
-            <!-- Danger Zone: Delete Order -->
-            <div class="pt-2 flex items-center justify-between text-xs text-slate-400">
-                <a href="{{ route('orders.edit', $order) }}" class="text-slate-600 hover:text-slate-900 underline">
-                    Edit Data Order
-                </a>
-                @if(Auth::user()->isAdmin())
-                    <form action="{{ route('orders.destroy', $order) }}" method="POST" onsubmit="return confirm('Hapus pesanan ini? Seluruh riwayat dan status akan dihapus permanen.');">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="text-rose-500 hover:text-rose-700 hover:underline">
-                            Hapus Order
-                        </button>
-                    </form>
-                @endif
-            </div>
+                    @endif
+                </div>
+            @endif
 
         </div>
 
@@ -315,6 +329,7 @@
 
 </div>
 
+@if(!Auth::user()->isPekerja())
 <!-- Modal Update Status Cucian -->
 <div id="statusModal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-200 space-y-4">
@@ -357,6 +372,7 @@
         </form>
     </div>
 </div>
+@endif
 
 @endsection
 

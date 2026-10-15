@@ -29,8 +29,12 @@ class OrderController extends Controller
             });
         }
 
-        if ($statusCucian = $request->input('status_cucian')) {
-            $query->where('status_cucian', $statusCucian);
+        if ($request->user()?->isPekerja()) {
+            $query->where('status_cucian', 'diterima');
+        } else {
+            if ($statusCucian = $request->input('status_cucian')) {
+                $query->where('status_cucian', $statusCucian);
+            }
         }
 
         if ($statusPembayaran = $request->input('status_pembayaran')) {
@@ -206,6 +210,10 @@ class OrderController extends Controller
 
     public function show(Order $order)
     {
+        if (auth()->user()?->isPekerja() && $order->status_cucian !== 'diterima') {
+            abort(403, 'Akses ditolak. Pekerja hanya dapat melihat orderan dengan status Diterima.');
+        }
+
         $order->loadMissing(['customer', 'service', 'statusLogs', 'payments']);
         $statuses = Order::listStatuses();
 

@@ -29,6 +29,7 @@ class UserFactory extends Factory
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
+            'role' => 'kasir',
             'remember_token' => Str::random(10),
         ];
     }
@@ -60,6 +61,16 @@ class UserFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'role' => 'kasir',
+        ]);
+    }
+
+    /**
+     * Indicate that the user is a pekerja.
+     */
+    public function pekerja(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'pekerja',
         ]);
     }
 }
