@@ -47,6 +47,7 @@ class WorkerRoleTest extends TestCase
         $this->actingAs($pekerja)->get('/customers')->assertStatus(403);
         $this->actingAs($pekerja)->get('/services')->assertStatus(403);
         $this->actingAs($pekerja)->get('/payments')->assertStatus(403);
+        $this->actingAs($pekerja)->get('/reports')->assertStatus(403);
         $this->actingAs($pekerja)->get('/users')->assertStatus(403);
         $this->actingAs($pekerja)->get('/orders/create')->assertStatus(403);
     }

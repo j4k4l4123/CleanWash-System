@@ -5,6 +5,7 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\TrackingController;
 use App\Http\Controllers\UserController;
@@ -53,6 +54,10 @@ Route::middleware('auth')->group(function (): void {
         Route::get('/payments', [PaymentController::class, 'index'])->name('payments.index');
         Route::post('/orders/{order}/pay', [PaymentController::class, 'store'])->name('payments.store');
         Route::get('/payments/{payment}/receipt', [PaymentController::class, 'receipt'])->name('payments.receipt');
+
+        // Laporan Keuangan & Rekapitulasi
+        Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+        Route::get('/reports/print', [ReportController::class, 'print'])->name('reports.print');
     });
 
     // Detail Order Cucian (Bisa diakses Pekerja, Kasir, Admin)

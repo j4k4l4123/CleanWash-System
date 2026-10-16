@@ -41,6 +41,12 @@
                 </a>
             @endif
             @if(!Auth::user()->isPekerja())
+                <a href="{{ route('orders.print', $order) }}" target="_blank" class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition shadow-xs" title="Cetak Nota Cucian">
+                    <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+                    </svg>
+                    <span>Cetak Nota</span>
+                </a>
                 <button type="button" onclick="openStatusModal()" class="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-brand-600 rounded-xl hover:bg-brand-700 transition shadow-xs">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
@@ -268,6 +274,17 @@
                             @endif
                             <div class="pt-2 text-slate-500 text-[11px]">
                                 Dibayar pada: {{ $pay ? $pay->tgl_bayar->isoFormat('D MMM Y, HH:mm') : $order->updated_at->isoFormat('D MMM Y, HH:mm') }} WIB
+                            </div>
+                            <div class="pt-2.5 border-t border-emerald-200 flex items-center justify-between text-xs">
+                                @if($pay)
+                                    <a href="{{ route('payments.receipt', $pay) }}" target="_blank" class="font-semibold text-emerald-800 hover:text-emerald-950 underline inline-flex items-center gap-1">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                                        <span>Cetak Kwitansi</span>
+                                    </a>
+                                @endif
+                                <a href="{{ route('orders.print', $order) }}" target="_blank" class="font-semibold text-emerald-800 hover:text-emerald-950 underline inline-flex items-center gap-1">
+                                    <span>Cetak Nota</span>
+                                </a>
                             </div>
                         </div>
                     @else
