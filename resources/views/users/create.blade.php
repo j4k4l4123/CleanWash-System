@@ -7,12 +7,7 @@
 
     <!-- Breadcrumb & Header -->
     <div>
-        <a href="{{ route('users.index') }}" class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-500 hover:text-slate-800 transition mb-2">
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-            </svg>
-            <span>Kembali ke Daftar Petugas</span>
-        </a>
+
         <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Tambah Petugas Baru</h1>
         <p class="text-sm text-slate-500">Daftarkan akun kasir atau admin baru untuk mengakses sistem.</p>
     </div>
