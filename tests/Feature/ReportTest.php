@@ -29,16 +29,28 @@ class ReportTest extends TestCase
         $this->actingAs($pekerja)->get('/reports/print')->assertStatus(403);
     }
 
-    public function test_kasir_and_admin_can_access_reports(): void
+    public function test_kasir_cannot_access_reports(): void
     {
         $kasir = User::factory()->kasir()->create();
-        $admin = User::factory()->admin()->create();
 
-        $this->actingAs($kasir)->get('/reports')->assertStatus(200)->assertSee('Laporan');
-        $this->actingAs($kasir)->get('/reports/print')->assertStatus(200)->assertSee('CLEANWASH MANAGEMENT LAUNDRY');
+        $this->actingAs($kasir)->get('/reports')->assertStatus(403);
+        $this->actingAs($kasir)->get('/reports/print')->assertStatus(403);
+
+        // Kasir cannot see Laporan Keuangan in navigation
+        $response = $this->actingAs($kasir)->get(route('orders.index'));
+        $response->assertDontSee('Laporan Keuangan');
+    }
+
+    public function test_admin_can_access_reports(): void
+    {
+        $admin = User::factory()->admin()->create();
 
         $this->actingAs($admin)->get('/reports')->assertStatus(200)->assertSee('Laporan');
         $this->actingAs($admin)->get('/reports/print')->assertStatus(200)->assertSee('CLEANWASH MANAGEMENT LAUNDRY');
+
+        // Admin sees Laporan Keuangan in navigation
+        $response = $this->actingAs($admin)->get('/reports');
+        $response->assertSee('Laporan Keuangan');
     }
 
     public function test_report_calculates_financial_metrics_correctly(): void
