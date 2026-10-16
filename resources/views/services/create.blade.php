@@ -10,9 +10,7 @@
             <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Tambah Layanan Laundry</h1>
             <p class="text-sm text-slate-500">Atur paket cucian, harga tarif, dan estimasi waktu selesai.</p>
         </div>
-        <a href="{{ route('services.index') }}" class="px-3.5 py-1.5 text-xs font-medium text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition">
-            Kembali
-        </a>
+
     </div>
 
     <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs">
