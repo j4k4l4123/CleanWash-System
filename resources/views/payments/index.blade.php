@@ -126,8 +126,8 @@
                                 @endif
                             </td>
                             <td class="px-5 py-4 text-right">
-                                <a href="{{ route('payments.receipt', $pay) }}" target="_blank" class="inline-flex items-center gap-1 px-3 py-1 text-xs font-medium text-brand-700 bg-brand-50 hover:bg-brand-100 rounded-lg transition">
-                                    Kwitansi
+                                <a href="{{ route('orders.show', $pay->order) }}" class="inline-flex items-center gap-1 px-3 py-1 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition">
+                                    Lihat Order
                                 </a>
                             </td>
                         </tr>

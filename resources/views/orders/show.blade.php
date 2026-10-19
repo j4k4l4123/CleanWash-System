@@ -275,14 +275,7 @@
                             <div class="pt-2 text-slate-500 text-[11px]">
                                 Dibayar pada: {{ $pay ? $pay->tgl_bayar->isoFormat('D MMM Y, HH:mm') : $order->updated_at->isoFormat('D MMM Y, HH:mm') }} WIB
                             </div>
-                            @if($pay)
-                                <div class="pt-2.5 border-t border-emerald-200 flex items-center justify-end text-xs">
-                                    <a href="{{ route('payments.receipt', $pay) }}" target="_blank" class="font-semibold text-emerald-800 hover:text-emerald-950 underline inline-flex items-center gap-1">
-                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
-                                        <span>Cetak Kwitansi</span>
-                                    </a>
-                                </div>
-                            @endif
+
                         </div>
                     @else
                         <!-- Settle Payment Form -->

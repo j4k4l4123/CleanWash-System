@@ -84,9 +84,6 @@
                             <a href="{{ route('services.index') }}" class="px-3 py-2 rounded-lg text-sm font-medium transition {{ request()->routeIs('services.*') ? 'text-brand-700 bg-brand-50' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100' }}">
                                 Layanan
                             </a>
-                            <a href="{{ route('payments.index') }}" class="px-3 py-2 rounded-lg text-sm font-medium transition {{ request()->routeIs('payments.*') ? 'text-brand-700 bg-brand-50' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100' }}">
-                                Pembayaran
-                            </a>
                         @endif
                         @if(Auth::user()->isAdmin())
                             <a href="{{ route('reports.index') }}" class="px-3 py-2 rounded-lg text-sm font-medium transition {{ request()->routeIs('reports.*') ? 'text-brand-700 bg-brand-50' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100' }}">
@@ -155,7 +152,6 @@
                     @if(!Auth::user()->isPekerja())
                         <a href="{{ route('customers.index') }}" class="block px-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('customers.*') ? 'text-brand-700 bg-brand-50' : 'text-slate-600' }}">Pelanggan</a>
                         <a href="{{ route('services.index') }}" class="block px-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('services.*') ? 'text-brand-700 bg-brand-50' : 'text-slate-600' }}">Layanan</a>
-                        <a href="{{ route('payments.index') }}" class="block px-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('payments.*') ? 'text-brand-700 bg-brand-50' : 'text-slate-600' }}">Pembayaran</a>
                     @endif
                     @if(Auth::user()->isAdmin())
                         <a href="{{ route('reports.index') }}" class="block px-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('reports.*') ? 'text-brand-700 bg-brand-50' : 'text-slate-600' }}">Laporan Keuangan</a>
