@@ -11,9 +11,7 @@
             <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Terima Cucian Baru</h1>
             <p class="text-sm text-slate-500">Input transaksi laundry, penimbangan berat, dan pembayaran kasir.</p>
         </div>
-        <a href="{{ route('orders.index') }}" class="px-3.5 py-1.5 text-xs font-medium text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition">
-            Kembali
-        </a>
+
     </div>
 
     <!-- Main Order Form -->
@@ -54,8 +52,8 @@
                         <option value="">-- Pilih Layanan --</option>
                         @foreach ($services as $svc)
                             @if (is_object($svc))
-                                <option value="{{ $svc->id }}" 
-                                        data-harga="{{ $svc->harga }}" 
+                                <option value="{{ $svc->id }}"
+                                        data-harga="{{ $svc->harga }}"
                                         data-jenis="{{ $svc->jenis }}"
                                         data-durasi="{{ $svc->durasi_jam }}"
                                         {{ old('service_id') == $svc->id ? 'selected' : '' }}>
@@ -200,7 +198,7 @@
         const totalDisplay = document.getElementById('totalHargaDisplay');
 
         const selectedOption = serviceSelect.options[serviceSelect.selectedIndex];
-        
+
         if (!selectedOption || !selectedOption.value) {
             totalDisplay.innerText = 'Rp 0';
             estimasiInfo.innerText = 'Pilih layanan untuk melihat estimasi selesai';
