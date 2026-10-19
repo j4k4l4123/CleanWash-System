@@ -92,9 +92,9 @@
                 </thead>
                 <tbody class="divide-y divide-slate-100 text-slate-700">
                     @forelse ($orders as $order)
-                        <tr class="hover:bg-slate-50/70 transition">
+                        <tr onclick="if(!event.target.closest('button, select, input, a')) window.location='{{ route('orders.show', $order) }}'" class="hover:bg-slate-50/80 transition cursor-pointer group">
                             <td class="px-5 py-4 font-mono font-semibold text-slate-900">
-                                <a href="{{ route('orders.show', $order) }}" class="text-brand-600 hover:underline">
+                                <a href="{{ route('orders.show', $order) }}" class="text-brand-600 group-hover:underline">
                                     {{ $order->kode_order }}
                                 </a>
                             </td>
@@ -103,9 +103,7 @@
                                 <div class="text-[11px] text-slate-400">{{ $order->tgl_masuk->format('H:i') }} WIB</div>
                             </td>
                             <td class="px-5 py-4">
-                                <a href="{{ route('orders.show', $order) }}" class="font-medium text-slate-900 hover:text-brand-600 transition block">
-                                    {{ $order->customer->nama }}
-                                </a>
+                                <div class="font-medium text-slate-900">{{ $order->customer->nama }}</div>
                                 <div class="text-xs text-slate-400 font-mono">{{ $order->customer->no_hp }}</div>
                             </td>
                             <td class="px-5 py-4">
