@@ -56,14 +56,12 @@
                 </thead>
                 <tbody class="divide-y divide-slate-100 text-slate-700">
                     @forelse ($customers as $cust)
-                        <tr class="hover:bg-slate-50/70 transition">
+                        <tr onclick="if(!event.target.closest('button, select, input, a')) window.location='{{ route('customers.show', $cust) }}'" class="hover:bg-slate-50/80 transition cursor-pointer group">
                             <td class="px-5 py-4 font-mono text-xs font-semibold text-brand-700">
                                 {{ $cust->kode_pelanggan }}
                             </td>
                             <td class="px-5 py-4">
-                                <a href="{{ route('customers.show', $cust) }}" class="font-medium text-slate-900 hover:text-brand-600 transition">
-                                    {{ $cust->nama }}
-                                </a>
+                                <div class="font-medium text-slate-900 group-hover:text-brand-600 transition">{{ $cust->nama }}</div>
                                 @if($cust->catatan)
                                     <div class="text-xs text-slate-400 mt-0.5 line-clamp-1">{{ $cust->catatan }}</div>
                                 @endif

@@ -67,19 +67,19 @@
                 </thead>
                 <tbody class="divide-y divide-slate-100 text-slate-700">
                     @forelse ($users as $u)
-                        <tr class="hover:bg-slate-50/70 transition">
+                        <tr onclick="if(!event.target.closest('button, select, input, a')) window.location='{{ route('users.edit', $u) }}'" class="hover:bg-slate-50/80 transition cursor-pointer group">
                             <td class="px-5 py-3.5">
                                 <div class="flex items-center gap-2.5">
                                     <div class="w-8 h-8 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center font-bold text-xs">
                                         {{ strtoupper(substr($u->name, 0, 1)) }}
                                     </div>
                                     <div>
-                                        <a href="{{ route('users.edit', $u) }}" class="font-semibold text-slate-900 hover:text-brand-600 transition flex items-center gap-1.5">
+                                        <div class="font-semibold text-slate-900 group-hover:text-brand-600 transition flex items-center gap-1.5">
                                             <span>{{ $u->name }}</span>
                                             @if($u->id === Auth::id())
                                                 <span class="text-[10px] font-medium bg-brand-50 text-brand-700 border border-brand-200 px-1.5 py-0.2 rounded-md">Akun Anda</span>
                                             @endif
-                                        </a>
+                                        </div>
                                     </div>
                                 </div>
                             </td>

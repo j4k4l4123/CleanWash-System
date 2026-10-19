@@ -39,15 +39,9 @@
                 </thead>
                 <tbody class="divide-y divide-slate-100 text-slate-700">
                     @forelse ($services as $service)
-                        <tr class="hover:bg-slate-50/70 transition">
+                        <tr @if(Auth::user()->isAdmin()) onclick="if(!event.target.closest('button, select, input, a')) window.location='{{ route('services.edit', $service) }}'" class="hover:bg-slate-50/80 transition cursor-pointer group" @else class="hover:bg-slate-50/70 transition" @endif>
                             <td class="px-5 py-4">
-                                @if(Auth::user()->isAdmin())
-                                    <a href="{{ route('services.edit', $service) }}" class="font-semibold text-slate-900 hover:text-brand-600 transition inline-block">
-                                        {{ $service->nama_layanan }}
-                                    </a>
-                                @else
-                                    <div class="font-semibold text-slate-900">{{ $service->nama_layanan }}</div>
-                                @endif
+                                <div class="font-semibold text-slate-900 @if(Auth::user()->isAdmin()) group-hover:text-brand-600 @endif transition">{{ $service->nama_layanan }}</div>
                                 @if($service->deskripsi)
                                     <div class="text-xs text-slate-400 mt-0.5">{{ $service->deskripsi }}</div>
                                 @endif
