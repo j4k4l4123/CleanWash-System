@@ -68,15 +68,38 @@
                 <label for="is_active" class="text-sm font-medium text-slate-700">Layanan Aktif</label>
             </div>
 
-            <div class="pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
-                <a href="{{ route('services.index') }}" class="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 transition">
-                    Batal
-                </a>
-                <button type="submit" class="px-5 py-2 text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 rounded-xl transition shadow-xs">
-                    Perbarui Layanan
-                </button>
+            <div class="pt-4 border-t border-slate-100 flex items-center justify-between">
+                <div>
+                    @if(Auth::user()->isAdmin())
+                        @if($service->orders()->count() === 0)
+                            <button type="submit" form="delete-service-form" class="px-4 py-2 text-sm font-medium text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-xl transition">
+                                Hapus Layanan
+                            </button>
+                        @else
+                            <button type="button" disabled class="px-4 py-2 text-sm font-medium text-slate-400 bg-slate-100 rounded-xl cursor-not-allowed opacity-60" title="Tidak dapat dihapus karena sudah memiliki {{ $service->orders()->count() }} riwayat order. Gunakan opsi nonaktifkan jika tidak ingin digunakan lagi.">
+                                Hapus Layanan
+                            </button>
+                        @endif
+                    @endif
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <a href="{{ route('services.index') }}" class="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 transition">
+                        Batal
+                    </a>
+                    <button type="submit" class="px-5 py-2 text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 rounded-xl transition shadow-xs">
+                        Perbarui Layanan
+                    </button>
+                </div>
             </div>
         </form>
+
+        @if(Auth::user()->isAdmin() && $service->orders()->count() === 0)
+            <form id="delete-service-form" action="{{ route('services.destroy', $service) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus layanan {{ $service->nama_layanan }}?');" class="hidden">
+                @csrf
+                @method('DELETE')
+            </form>
+        @endif
     </div>
 
 </div>

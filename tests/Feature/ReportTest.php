@@ -176,10 +176,10 @@ class ReportTest extends TestCase
         $detailResponse->assertSee('Cetak Nota');
         $detailResponse->assertSee(route('orders.print', $order));
 
-        // Order list view does not show Nota button (only Detail)
+        // Order list view does not show Nota button and links to order detail via order code
         $indexResponse = $this->actingAs($kasir)->get(route('orders.index'));
         $indexResponse->assertStatus(200);
-        $indexResponse->assertSee('Detail');
+        $indexResponse->assertSee(route('orders.show', $order));
         $indexResponse->assertDontSee(route('orders.print', $order));
     }
 }

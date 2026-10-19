@@ -88,7 +88,6 @@
                         @if(!Auth::user()->isPekerja())
                             <th class="px-5 py-3.5">Pembayaran</th>
                         @endif
-                        <th class="px-5 py-3.5 text-right">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 text-slate-700">
@@ -104,7 +103,9 @@
                                 <div class="text-[11px] text-slate-400">{{ $order->tgl_masuk->format('H:i') }} WIB</div>
                             </td>
                             <td class="px-5 py-4">
-                                <div class="font-medium text-slate-900">{{ $order->customer->nama }}</div>
+                                <a href="{{ route('orders.show', $order) }}" class="font-medium text-slate-900 hover:text-brand-600 transition block">
+                                    {{ $order->customer->nama }}
+                                </a>
                                 <div class="text-xs text-slate-400 font-mono">{{ $order->customer->no_hp }}</div>
                             </td>
                             <td class="px-5 py-4">
@@ -149,17 +150,10 @@
                                     </span>
                                 </td>
                             @endif
-                            <td class="px-5 py-4 text-right">
-                                <div class="flex items-center justify-end gap-1.5">
-                                    <a href="{{ route('orders.show', $order) }}" class="px-2.5 py-1 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition">
-                                        Detail
-                                    </a>
-                                </div>
-                            </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="{{ Auth::user()->isPekerja() ? 9 : 10 }}" class="px-5 py-8 text-center text-slate-400">
+                            <td colspan="{{ Auth::user()->isPekerja() ? 8 : 9 }}" class="px-5 py-8 text-center text-slate-400">
                                 Tidak ada data order cucian yang sesuai dengan filter.
                             </td>
                         </tr>

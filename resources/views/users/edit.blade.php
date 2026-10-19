@@ -107,15 +107,32 @@
             </div>
 
             <!-- Submit Buttons -->
-            <div class="pt-4 flex items-center justify-end gap-3 border-t border-slate-100">
-                <a href="{{ route('users.index') }}" class="px-5 py-2.5 text-sm font-medium text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-xl transition">
-                    Batal
-                </a>
-                <button type="submit" class="px-5 py-2.5 text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 rounded-xl transition shadow-xs">
-                    Simpan Perubahan
-                </button>
+            <div class="pt-4 flex items-center justify-between border-t border-slate-100">
+                <div>
+                    @if($user->id !== Auth::id())
+                        <button type="submit" form="delete-user-form" class="px-4 py-2.5 text-sm font-medium text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-xl transition">
+                            Hapus Petugas
+                        </button>
+                    @endif
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <a href="{{ route('users.index') }}" class="px-5 py-2.5 text-sm font-medium text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-xl transition">
+                        Batal
+                    </a>
+                    <button type="submit" class="px-5 py-2.5 text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 rounded-xl transition shadow-xs">
+                        Simpan Perubahan
+                    </button>
+                </div>
             </div>
         </form>
+
+        @if($user->id !== Auth::id())
+            <form id="delete-user-form" action="{{ route('users.destroy', $user) }}" method="POST" onsubmit="return confirm('Apakah anda yakin untuk menghapus data pekerja ini?')" class="hidden">
+                @csrf
+                @method('DELETE')
+            </form>
+        @endif
     </div>
 
 </div>

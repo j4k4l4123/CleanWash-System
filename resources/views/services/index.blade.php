@@ -35,16 +35,19 @@
                         <th class="px-5 py-3.5">Estimasi Durasi</th>
                         <th class="px-5 py-3.5">Total Digunakan</th>
                         <th class="px-5 py-3.5">Status</th>
-                        @if(Auth::user()->isAdmin())
-                            <th class="px-5 py-3.5 text-right">Aksi</th>
-                        @endif
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 text-slate-700">
                     @forelse ($services as $service)
                         <tr class="hover:bg-slate-50/70 transition">
                             <td class="px-5 py-4">
-                                <div class="font-semibold text-slate-900">{{ $service->nama_layanan }}</div>
+                                @if(Auth::user()->isAdmin())
+                                    <a href="{{ route('services.edit', $service) }}" class="font-semibold text-slate-900 hover:text-brand-600 transition inline-block">
+                                        {{ $service->nama_layanan }}
+                                    </a>
+                                @else
+                                    <div class="font-semibold text-slate-900">{{ $service->nama_layanan }}</div>
+                                @endif
                                 @if($service->deskripsi)
                                     <div class="text-xs text-slate-400 mt-0.5">{{ $service->deskripsi }}</div>
                                 @endif
@@ -86,38 +89,10 @@
                                     </span>
                                 @endif
                             </td>
-                            @if(Auth::user()->isAdmin())
-                                <td class="px-5 py-4 text-right">
-                                    <div class="flex items-center justify-end gap-1.5">
-                                        <form action="{{ route('services.toggle', $service) }}" method="POST" class="inline">
-                                            @csrf
-                                            <button type="submit" class="px-2.5 py-1 text-xs font-medium text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 rounded-lg transition" title="Ubah status aktif">
-                                                {{ $service->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
-                                            </button>
-                                        </form>
-                                        <a href="{{ route('services.edit', $service) }}" class="px-2.5 py-1 text-xs font-medium text-amber-700 bg-amber-50 hover:bg-amber-100 rounded-lg transition">
-                                            Edit
-                                        </a>
-                                        @if($service->orders_count === 0)
-                                            <form action="{{ route('services.destroy', $service) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus layanan {{ $service->nama_layanan }}?');" class="inline">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="px-2.5 py-1 text-xs font-medium text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-lg transition" title="Hapus layanan">
-                                                    Hapus
-                                                </button>
-                                            </form>
-                                        @else
-                                            <button type="button" disabled class="px-2.5 py-1 text-xs font-medium text-slate-400 bg-slate-100 rounded-lg cursor-not-allowed opacity-60" title="Tidak dapat dihapus karena sudah memiliki {{ $service->orders_count }} riwayat order. Silakan gunakan opsi 'Nonaktifkan'.">
-                                                Hapus
-                                            </button>
-                                        @endif
-                                    </div>
-                                </td>
-                            @endif
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="px-5 py-8 text-center text-slate-400">
+                            <td colspan="6" class="px-5 py-8 text-center text-slate-400">
                                 Belum ada layanan terdaftar.
                             </td>
                         </tr>
