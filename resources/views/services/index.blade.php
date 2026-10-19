@@ -99,13 +99,17 @@
                                             Edit
                                         </a>
                                         @if($service->orders_count === 0)
-                                            <form action="{{ route('services.destroy', $service) }}" method="POST" onsubmit="return confirm('Hapus layanan ini?');" class="inline">
+                                            <form action="{{ route('services.destroy', $service) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus layanan {{ $service->nama_layanan }}?');" class="inline">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="px-2.5 py-1 text-xs font-medium text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-lg transition">
+                                                <button type="submit" class="px-2.5 py-1 text-xs font-medium text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-lg transition" title="Hapus layanan">
                                                     Hapus
                                                 </button>
                                             </form>
+                                        @else
+                                            <button type="button" disabled class="px-2.5 py-1 text-xs font-medium text-slate-400 bg-slate-100 rounded-lg cursor-not-allowed opacity-60" title="Tidak dapat dihapus karena sudah memiliki {{ $service->orders_count }} riwayat order. Silakan gunakan opsi 'Nonaktifkan'.">
+                                                Hapus
+                                            </button>
                                         @endif
                                     </div>
                                 </td>
