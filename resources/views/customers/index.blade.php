@@ -52,7 +52,6 @@
                         <th class="px-5 py-3.5">No. HP / WhatsApp</th>
                         <th class="px-5 py-3.5">Alamat</th>
                         <th class="px-5 py-3.5">Total Order</th>
-                        <th class="px-5 py-3.5 text-right">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 text-slate-700">
@@ -80,29 +79,10 @@
                                     {{ $cust->orders_count }} Transaksi
                                 </span>
                             </td>
-                            <td class="px-5 py-4 text-right">
-                                <div class="flex items-center justify-end gap-1.5">
-                                    <a href="{{ route('customers.show', $cust) }}" class="px-2.5 py-1 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition">
-                                        Detail
-                                    </a>
-                                    <a href="{{ route('customers.edit', $cust) }}" class="px-2.5 py-1 text-xs font-medium text-amber-700 bg-amber-50 hover:bg-amber-100 rounded-lg transition">
-                                        Edit
-                                    </a>
-                                    @if(Auth::user()->isAdmin())
-                                        <form action="{{ route('customers.destroy', $cust) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus pelanggan {{ $cust->nama }}?');" class="inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="px-2.5 py-1 text-xs font-medium text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-lg transition">
-                                                Hapus
-                                            </button>
-                                        </form>
-                                    @endif
-                                </div>
-                            </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-5 py-8 text-center text-slate-400">
+                            <td colspan="5" class="px-5 py-8 text-center text-slate-400">
                                 Belum ada data pelanggan yang ditemukan.
                             </td>
                         </tr>
