@@ -16,7 +16,18 @@ class Customer extends Model
 
     public function orders()
     {
-        return $this->hasMany(Order::class)->orderBy('created_at', 'desc');
+        return $this->hasMany(Order::class);
+    }
+
+    public static function generateKodePelanggan(): string
+    {
+        $nextNumber = (static::max('id') ?? 0) + 1;
+        do {
+            $code = 'CUST-'.str_pad((string) $nextNumber, 4, '0', STR_PAD_LEFT);
+            $nextNumber++;
+        } while (static::where('kode_pelanggan', $code)->exists());
+
+        return $code;
     }
 
     public function getTotalOrdersAttribute(): int

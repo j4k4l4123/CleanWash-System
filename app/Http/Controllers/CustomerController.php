@@ -42,8 +42,7 @@ class CustomerController extends Controller
             'catatan' => 'nullable|string',
         ]);
 
-        $maxId = Customer::max('id') ?? 0;
-        $validated['kode_pelanggan'] = 'CUST-'.str_pad($maxId + 1, 4, '0', STR_PAD_LEFT);
+        $validated['kode_pelanggan'] = Customer::generateKodePelanggan();
 
         $customer = Customer::create($validated);
         $this->clearCustomerCache();
@@ -55,6 +54,7 @@ class CustomerController extends Controller
     public function show(Customer $customer)
     {
         $stats = $customer->orders()
+            ->reorder()
             ->selectRaw("
                 COUNT(*) as total_orders,
                 COALESCE(SUM(CASE WHEN status_pembayaran = 'lunas' THEN total_harga ELSE 0 END), 0) as total_spending,
@@ -115,8 +115,7 @@ class CustomerController extends Controller
             'catatan' => 'nullable|string',
         ]);
 
-        $maxId = Customer::max('id') ?? 0;
-        $validated['kode_pelanggan'] = 'CUST-'.str_pad($maxId + 1, 4, '0', STR_PAD_LEFT);
+        $validated['kode_pelanggan'] = Customer::generateKodePelanggan();
 
         $customer = Customer::create($validated);
         $this->clearCustomerCache();
