@@ -8,7 +8,7 @@
     <!-- Header & Action -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-            <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Kelola Petugas & Pengguna</h1>
+            <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Kelola Petugas</h1>
             <p class="text-sm text-slate-500">Atur hak akses akun administrator dan kasir laundry.</p>
         </div>
         <div>
