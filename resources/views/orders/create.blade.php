@@ -92,7 +92,7 @@
             <!-- Notes -->
             <div>
                 <label for="catatan" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
-                    Catatan Cucian / Instruksi Khusus
+                    Catatan Cucian
                 </label>
                 <textarea id="catatan" name="catatan" rows="2" placeholder="Contoh: Pakaian putih dipisah, jangan gunakan pewangi berlebih, noda kopi di lengan baju." class="w-full px-4 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500 focus:bg-white transition">{{ old('catatan') }}</textarea>
             </div>
@@ -102,7 +102,7 @@
                 <div class="flex items-center gap-2">
                     <input type="checkbox" id="bayar_sekarang" name="bayar_sekarang" value="1" {{ old('bayar_sekarang') ? 'checked' : '' }} onchange="togglePaymentBox()" class="w-4 h-4 text-brand-600 rounded border-slate-300 focus:ring-brand-500">
                     <label for="bayar_sekarang" class="text-sm font-semibold text-slate-800 cursor-pointer">
-                        Bayar Sekarang di Kasir (Status: Lunas)
+                        Bayar Sekarang
                     </label>
                 </div>
 
