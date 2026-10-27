@@ -86,7 +86,7 @@
                         <th class="px-5 py-3.5">Status Cucian</th>
                         <th class="px-5 py-3.5">Catatan</th>
                         @if(!Auth::user()->isPekerja())
-                            <th class="px-5 py-3.5">Pembayaran</th>
+                            <th class="px-5 py-3.5">Status Pembayaran</th>
                         @endif
                     </tr>
                 </thead>
@@ -176,9 +176,9 @@
         Pilih Status Cucian
     </div>
     <div class="p-1 space-y-0.5">
-        <button type="button" 
-                data-status="diterima" 
-                onclick="handleStatusSelect('diterima', 'Diterima')" 
+        <button type="button"
+                data-status="diterima"
+                onclick="handleStatusSelect('diterima', 'Diterima')"
                 class="status-opt w-full text-left px-3 py-2 rounded-xl flex items-center justify-between text-slate-700 hover:bg-amber-50 hover:text-amber-900 transition group cursor-pointer">
             <span class="inline-flex items-center gap-2">
                 <span class="w-2.5 h-2.5 rounded-full bg-amber-400 border border-amber-500"></span>
@@ -187,9 +187,9 @@
             <span class="check-icon text-amber-600 font-bold hidden text-xs">✓</span>
         </button>
 
-        <button type="button" 
-                data-status="siap_diambil" 
-                onclick="handleStatusSelect('siap_diambil', 'Siap Diambil')" 
+        <button type="button"
+                data-status="siap_diambil"
+                onclick="handleStatusSelect('siap_diambil', 'Siap Diambil')"
                 class="status-opt w-full text-left px-3 py-2 rounded-xl flex items-center justify-between text-slate-700 hover:bg-teal-50 hover:text-teal-900 transition group cursor-pointer">
             <span class="inline-flex items-center gap-2">
                 <span class="w-2.5 h-2.5 rounded-full bg-teal-400 border border-teal-500"></span>
@@ -198,9 +198,9 @@
             <span class="check-icon text-teal-600 font-bold hidden text-xs">✓</span>
         </button>
 
-        <button type="button" 
-                data-status="selesai" 
-                onclick="handleStatusSelect('selesai', 'Selesai')" 
+        <button type="button"
+                data-status="selesai"
+                onclick="handleStatusSelect('selesai', 'Selesai')"
                 class="status-opt w-full text-left px-3 py-2 rounded-xl flex items-center justify-between text-slate-700 hover:bg-emerald-50 hover:text-emerald-900 transition group cursor-pointer">
             <span class="inline-flex items-center gap-2">
                 <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 border border-emerald-500"></span>
