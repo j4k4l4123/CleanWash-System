@@ -42,7 +42,7 @@
                 <label for="catatan" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
                     Catatan Khusus (Opsional)
                 </label>
-                <input type="text" id="catatan" name="catatan" value="{{ old('catatan') }}" placeholder="Contoh: Suka pewangi lavender, jangan pakai pemutih" class="w-full px-4 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500 focus:bg-white transition">
+                <input type="text" id="catatan" name="catatan" value="{{ old('catatan') }}"  class="w-full px-4 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500 focus:bg-white transition">
             </div>
 
             <div class="pt-4 border-t border-slate-100 flex items-center justify-end gap-3">

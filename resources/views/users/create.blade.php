@@ -22,7 +22,7 @@
                 <label for="name" class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">
                     Nama Lengkap Petugas <span class="text-rose-500">*</span>
                 </label>
-                <input type="text" name="name" id="name" value="{{ old('name') }}" required placeholder="Contoh: Budi Santoso"
+                <input type="text" name="name" id="name" value="{{ old('name') }}" required
                     class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition">
             </div>
 
@@ -31,7 +31,7 @@
                 <label for="email" class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">
                     Alamat Email (Untuk Login) <span class="text-rose-500">*</span>
                 </label>
-                <input type="email" name="email" id="email" value="{{ old('email') }}" required placeholder="contoh: budi@laundry.test"
+                <input type="email" name="email" id="email" value="{{ old('email') }}" required
                     class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition">
             </div>
 
@@ -40,7 +40,7 @@
                 <label for="no_hp" class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">
                     Nomor WhatsApp / HP
                 </label>
-                <input type="text" name="no_hp" id="no_hp" value="{{ old('no_hp') }}" placeholder="Contoh: 081234567890"
+                <input type="text" name="no_hp" id="no_hp" value="{{ old('no_hp') }}"
                     class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition">
             </div>
 
