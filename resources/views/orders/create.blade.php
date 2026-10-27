@@ -94,7 +94,7 @@
                 <label for="catatan" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
                     Catatan Cucian
                 </label>
-                <textarea id="catatan" name="catatan" rows="2" placeholder="Contoh: Pakaian putih dipisah, jangan gunakan pewangi berlebih, noda kopi di lengan baju." class="w-full px-4 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500 focus:bg-white transition">{{ old('catatan') }}</textarea>
+                <textarea id="catatan" name="catatan" rows="2"  class="w-full px-4 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500 focus:bg-white transition">{{ old('catatan') }}</textarea>
             </div>
 
             <!-- Section 3: Payment Section -->

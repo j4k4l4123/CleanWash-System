@@ -21,7 +21,7 @@
                 <label for="nama_layanan" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
                     Nama Layanan / Paket <span class="text-rose-500">*</span>
                 </label>
-                <input type="text" id="nama_layanan" name="nama_layanan" value="{{ old('nama_layanan') }}" required placeholder="Contoh: Cuci Kering Setrika Reguler" class="w-full px-4 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500 focus:bg-white transition">
+                <input type="text" id="nama_layanan" name="nama_layanan" value="{{ old('nama_layanan') }}" required  class="w-full px-4 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500 focus:bg-white transition">
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -39,7 +39,7 @@
                     <label for="harga" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
                         Harga (Rp) <span class="text-rose-500">*</span>
                     </label>
-                    <input type="number" id="harga" name="harga" value="{{ old('harga') }}" required min="0" step="500" placeholder="Contoh: 7000" class="w-full px-4 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500 focus:bg-white transition">
+                    <input type="number" id="harga" name="harga" value="{{ old('harga') }}" required min="0" step="500"  class="w-full px-4 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500 focus:bg-white transition">
                 </div>
             </div>
 
@@ -49,7 +49,7 @@
                 </label>
                 <div class="flex items-center gap-2">
                     <input type="number" id="durasi_jam" name="durasi_jam" value="{{ old('durasi_jam', 24) }}" required min="1" class="w-36 px-4 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500 focus:bg-white transition">
-                    <span class="text-xs text-slate-500">Jam (Contoh: 6 jam untuk express, 24 jam untuk 1 hari, 48 jam untuk 2 hari)</span>
+                    <span class="text-xs text-slate-500"></span>
                 </div>
             </div>
 
@@ -57,7 +57,7 @@
                 <label for="deskripsi" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
                     Deskripsi / Keterangan Layanan
                 </label>
-                <textarea id="deskripsi" name="deskripsi" rows="2" placeholder="Contoh: Cuci bersih, pengeringan, setrika uap rapi berplastik." class="w-full px-4 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500 focus:bg-white transition">{{ old('deskripsi') }}</textarea>
+                <textarea id="deskripsi" name="deskripsi" rows="2"  class="w-full px-4 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500 focus:bg-white transition">{{ old('deskripsi') }}</textarea>
             </div>
 
             <div class="flex items-center gap-2 pt-2">
