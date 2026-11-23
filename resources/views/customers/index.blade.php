@@ -11,7 +11,13 @@
             <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Data Pelanggan</h1>
             <p class="text-sm text-slate-500">Kelola informasi pelanggan, kontak, dan riwayat pesanan.</p>
         </div>
-        <div>
+        <div class="flex items-center gap-2">
+            <button type="button" onclick="openCustomerModal()" class="inline-flex items-center gap-2 px-3.5 py-2 text-sm font-semibold text-brand-700 bg-brand-50 border border-brand-200 rounded-xl hover:bg-brand-100 transition shadow-xs">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                </svg>
+                <span>Tambah Cepat</span>
+            </button>
             <a href="{{ route('customers.create') }}" class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-brand-600 rounded-xl hover:bg-brand-700 transition shadow-xs">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
@@ -97,4 +103,10 @@
     </div>
 
 </div>
+
+@include('customers.partials.quick-modal', [
+    'targetSelectId' => null,
+    'redirectUrl' => route('customers.show', ':id')
+])
+
 @endsection

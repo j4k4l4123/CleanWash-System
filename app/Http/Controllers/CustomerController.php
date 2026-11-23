@@ -113,6 +113,11 @@ class CustomerController extends Controller
             'no_hp' => 'required|string|max:30',
             'alamat' => 'nullable|string',
             'catatan' => 'nullable|string',
+        ], [
+            'nama.required' => 'Nama pelanggan wajib diisi.',
+            'nama.max' => 'Nama pelanggan maksimal 255 karakter.',
+            'no_hp.required' => 'Nomor HP / WhatsApp wajib diisi.',
+            'no_hp.max' => 'Nomor HP maksimal 30 karakter.',
         ]);
 
         $validated['kode_pelanggan'] = Customer::generateKodePelanggan();

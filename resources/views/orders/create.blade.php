@@ -148,41 +148,7 @@
 
 </div>
 
-<!-- Quick Add Customer Modal -->
-<div id="customerModal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-200 space-y-4">
-        <div class="flex items-center justify-between pb-2 border-b border-slate-100">
-            <h3 class="text-base font-semibold text-slate-900">Tambah Pelanggan Baru</h3>
-            <button type="button" onclick="closeCustomerModal()" class="text-slate-400 hover:text-slate-600 text-sm font-bold">✕</button>
-        </div>
-
-        <div id="modalAlert" class="hidden p-3 rounded-lg text-xs font-medium"></div>
-
-        <div class="space-y-3">
-            <div>
-                <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Nama Pelanggan *</label>
-                <input type="text" id="modal_nama" placeholder="Contoh: Rina Anggraini" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500 focus:bg-white transition">
-            </div>
-            <div>
-                <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">No. HP / WhatsApp *</label>
-                <input type="text" id="modal_no_hp" placeholder="Contoh: 081298765432" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500 focus:bg-white transition">
-            </div>
-            <div>
-                <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Alamat (Opsional)</label>
-                <textarea id="modal_alamat" rows="2" placeholder="Contoh: Jl. Kenanga No. 45" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500 focus:bg-white transition"></textarea>
-            </div>
-        </div>
-
-        <div class="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
-            <button type="button" onclick="closeCustomerModal()" class="px-3.5 py-1.5 text-xs font-medium text-slate-600 hover:text-slate-900 transition">
-                Batal
-            </button>
-            <button type="button" onclick="submitQuickCustomer()" id="btnSubmitModal" class="px-4 py-1.5 text-xs font-semibold text-white bg-brand-600 hover:bg-brand-700 rounded-xl transition shadow-xs">
-                Simpan & Pilih
-            </button>
-        </div>
-    </div>
-</div>
+@include('customers.partials.quick-modal', ['targetSelectId' => 'customer_id'])
 
 @endsection
 
@@ -262,74 +228,6 @@
         const received = parseFloat(uangInput.value) || 0;
         const kembalian = Math.max(0, received - currentTotal);
         document.getElementById('kembalianDisplay').innerText = 'Rp ' + kembalian.toLocaleString('id-ID');
-    }
-
-    // Modal Quick Customer
-    function openCustomerModal() {
-        document.getElementById('customerModal').classList.remove('hidden');
-        document.getElementById('modal_nama').focus();
-    }
-
-    function closeCustomerModal() {
-        document.getElementById('customerModal').classList.add('hidden');
-        document.getElementById('modal_nama').value = '';
-        document.getElementById('modal_no_hp').value = '';
-        document.getElementById('modal_alamat').value = '';
-        document.getElementById('modalAlert').classList.add('hidden');
-    }
-
-    async function submitQuickCustomer() {
-        const nama = document.getElementById('modal_nama').value.trim();
-        const no_hp = document.getElementById('modal_no_hp').value.trim();
-        const alamat = document.getElementById('modal_alamat').value.trim();
-        const alertBox = document.getElementById('modalAlert');
-        const btn = document.getElementById('btnSubmitModal');
-
-        if (!nama || !no_hp) {
-            alertBox.innerText = 'Nama dan No. HP wajib diisi!';
-            alertBox.className = 'p-3 rounded-lg text-xs font-medium bg-rose-50 border border-rose-200 text-rose-800';
-            alertBox.classList.remove('hidden');
-            return;
-        }
-
-        btn.disabled = true;
-        btn.innerText = 'Menyimpan...';
-
-        try {
-            const res = await fetch('{{ route("customers.quick-store") }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Accept': 'application/json',
-                },
-                body: JSON.stringify({ nama, no_hp, alamat })
-            });
-
-            const data = await res.json();
-
-            if (data.success && data.customer) {
-                const select = document.getElementById('customer_id');
-                const opt = document.createElement('option');
-                opt.value = data.customer.id;
-                opt.innerText = `${data.customer.nama} (${data.customer.kode_pelanggan} - ${data.customer.no_hp})`;
-                opt.selected = true;
-                select.appendChild(opt);
-
-                closeCustomerModal();
-            } else {
-                alertBox.innerText = data.message || 'Gagal menyimpan data';
-                alertBox.className = 'p-3 rounded-lg text-xs font-medium bg-rose-50 border border-rose-200 text-rose-800';
-                alertBox.classList.remove('hidden');
-            }
-        } catch (err) {
-            alertBox.innerText = 'Terjadi kesalahan sistem.';
-            alertBox.className = 'p-3 rounded-lg text-xs font-medium bg-rose-50 border border-rose-200 text-rose-800';
-            alertBox.classList.remove('hidden');
-        } finally {
-            btn.disabled = false;
-            btn.innerText = 'Simpan & Pilih';
-        }
     }
 
     // Run on load
