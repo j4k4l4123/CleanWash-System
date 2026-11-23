@@ -19,13 +19,21 @@
             @method('PUT')
 
             <div>
-                <label for="customer_id" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
-                    Pelanggan <span class="text-rose-500">*</span>
-                </label>
+                <div class="flex items-center justify-between mb-1.5">
+                    <label for="customer_id" class="text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                        Pelanggan <span class="text-rose-500">*</span>
+                    </label>
+                    <button type="button" onclick="openCustomerModal()" class="text-xs font-semibold text-brand-600 hover:text-brand-700 flex items-center gap-1">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        <span>+ Tambah Pelanggan Baru</span>
+                    </button>
+                </div>
                 <select id="customer_id" name="customer_id" required class="w-full px-4 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500">
                     @foreach ($customers as $cust)
                         <option value="{{ $cust->id }}" {{ old('customer_id', $order->customer_id) == $cust->id ? 'selected' : '' }}>
-                            {{ $cust->nama }} ({{ $cust->kode_pelanggan }})
+                            {{ $cust->nama }} ({{ $cust->kode_pelanggan }} - {{ $cust->no_hp }})
                         </option>
                     @endforeach
                 </select>
@@ -72,4 +80,7 @@
     </div>
 
 </div>
+
+@include('customers.partials.quick-modal', ['targetSelectId' => 'customer_id'])
+
 @endsection

@@ -118,4 +118,99 @@ class CustomerManagementTest extends TestCase
         $newCode = Customer::generateKodePelanggan();
         $this->assertEquals('CUST-0003', $newCode);
     }
+
+    public function test_quick_create_customer_validation_fails_when_fields_are_missing(): void
+    {
+        $kasir = User::factory()->kasir()->create();
+
+        $response = $this->actingAs($kasir)->postJson(route('customers.quick-store'), []);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['nama', 'no_hp']);
+        $response->assertJsonFragment([
+            'nama' => ['Nama pelanggan wajib diisi.'],
+            'no_hp' => ['Nomor HP / WhatsApp wajib diisi.'],
+        ]);
+    }
+
+    public function test_quick_create_customer_with_catatan_and_alamat(): void
+    {
+        $kasir = User::factory()->kasir()->create();
+
+        $response = $this->actingAs($kasir)->postJson(route('customers.quick-store'), [
+            'nama' => 'Ahmad Dahlan',
+            'no_hp' => '081234567899',
+            'alamat' => 'Jl. Sudirman No. 99',
+            'catatan' => 'Alergi deterjen wangi menyengat',
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'success' => true,
+            'customer' => [
+                'nama' => 'Ahmad Dahlan',
+                'no_hp' => '081234567899',
+                'alamat' => 'Jl. Sudirman No. 99',
+                'catatan' => 'Alergi deterjen wangi menyengat',
+            ],
+        ]);
+
+        $this->assertDatabaseHas('customers', [
+            'nama' => 'Ahmad Dahlan',
+            'catatan' => 'Alergi deterjen wangi menyengat',
+        ]);
+    }
+
+    public function test_quick_customer_modal_is_rendered_on_order_and_customer_pages(): void
+    {
+        $kasir = User::factory()->kasir()->create();
+        $customer = Customer::create([
+            'kode_pelanggan' => 'CUST-0001',
+            'nama' => 'Budi Santoso',
+            'no_hp' => '081234567890',
+        ]);
+        $service = Service::create([
+            'nama_layanan' => 'Cuci Kiloan Reguler',
+            'jenis' => 'kiloan',
+            'harga' => 8000,
+            'durasi_jam' => 24,
+            'is_active' => true,
+        ]);
+        $order = Order::create([
+            'kode_order' => 'ORD-TEST-001',
+            'customer_id' => $customer->id,
+            'service_id' => $service->id,
+            'berat_atau_jumlah' => 2,
+            'harga_per_satuan' => 8000,
+            'total_harga' => 16000,
+            'tgl_masuk' => now(),
+            'estimasi_selesai' => now()->addDay(),
+            'status_cucian' => 'diterima',
+            'status_pembayaran' => 'belum_lunas',
+        ]);
+
+        // Order create page
+        $createRes = $this->actingAs($kasir)->get(route('orders.create'));
+        $createRes->assertStatus(200);
+        $createRes->assertSee('id="customerModal"', false);
+        $createRes->assertSee('+ Tambah Pelanggan Baru');
+
+        // Order edit page
+        $editRes = $this->actingAs($kasir)->get(route('orders.edit', $order));
+        $editRes->assertStatus(200);
+        $editRes->assertSee('id="customerModal"', false);
+        $editRes->assertSee('+ Tambah Pelanggan Baru');
+
+        // Customers index page
+        $indexRes = $this->actingAs($kasir)->get(route('customers.index'));
+        $indexRes->assertStatus(200);
+        $indexRes->assertSee('id="customerModal"', false);
+        $indexRes->assertSee('Tambah Cepat');
+
+        // Dashboard page
+        $dashRes = $this->actingAs($kasir)->get(route('dashboard'));
+        $dashRes->assertStatus(200);
+        $dashRes->assertSee('id="customerModal"', false);
+        $dashRes->assertSee('+ Pelanggan Cepat');
+    }
 }

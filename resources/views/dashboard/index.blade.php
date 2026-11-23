@@ -11,9 +11,22 @@
             <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Dashboard Laundry</h1>
             <p class="text-sm text-slate-500">Ringkasan operasional dan aktivitas cucian hari ini, {{ \Carbon\Carbon::now()->isoFormat('dddd, D MMMM Y') }}.</p>
         </div>
-        <div>
-
-        </div>
+        @if(!Auth::user()->isPekerja())
+            <div class="flex items-center gap-2">
+                <a href="{{ route('orders.create') }}" class="inline-flex items-center gap-2 px-3.5 py-2 text-sm font-semibold text-white bg-brand-600 rounded-xl hover:bg-brand-700 transition shadow-xs">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    <span>Terima Order Baru</span>
+                </a>
+                <button type="button" onclick="openCustomerModal()" class="inline-flex items-center gap-2 px-3.5 py-2 text-sm font-semibold text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition shadow-xs">
+                    <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+                    </svg>
+                    <span>+ Pelanggan Cepat</span>
+                </button>
+            </div>
+        @endif
     </div>
 
     <!-- Metric Stat Cards -->
@@ -179,4 +192,12 @@
     </div>
 
 </div>
+
+@if(!Auth::user()->isPekerja())
+    @include('customers.partials.quick-modal', [
+        'targetSelectId' => null,
+        'redirectUrl' => route('orders.create') . '?customer_id=:id'
+    ])
+@endif
+
 @endsection
